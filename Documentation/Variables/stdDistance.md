@@ -1,0 +1,46 @@
+## Description
+
+stdDistance` is a numerical value representing a multiple of standard deviations used to set a distance threshold, that is used in multiple functions to define a search window, mutation range, a tolerance, and sensitivity control.
+
+---
+
+## Functions using
+
+- [[SmoothFourier]]
+- [[MutantOffspring]]
+- [[ms2Peak]]
+- [[PeakChromGauss]]
+- [[OverlappingGaussPeaks]]
+- [[AdjacencyList_mz]]
+- [[NPeaksRestrict]]
+- [[ms2Peak_contribution]]
+- [[MutationTimes]]
+- [[SplitParametersMat]]
+- [[mz_mz_std_ms1]]
+- [[RestrictStdPeaks]]
+- [[RemoveChromBackGround]]
+- [[MaxIntChromatogram]]
+- [[ParametersFitGaussPeaks]]
+- [[Find_ms2Peak]]
+- [[Chrom_ms1Peaks_Summaries]]
+- [[RefineChromMat]]
+- [[AdjacencyList_RT]]
+- [[ChromGaussPeak]]
+- [[ms2_peak_stats]]
+- [[ms2_features_stats]]
+- [[SmoothData_and_FindPeaks]]
+- [[mzPeak]]
+- [[CuttingFreq]]
+- [[Find_mzPeak]]
+- [[ParametersFitGaussParallelPeaks]]
+- [[ResolveFullChromatogram]]
+- [[ResolveChromPeaks]]
+- [[RetrieveChromatogram]]
+- [[AllSubChromatograms]]
+- [[Feat_RT_edges]]
+- [[PlotChromatogram]]
+- [[feat_ms2_Gauss]]
+- [[ModuleChromSummaries]]
+- [[ms2_peakStats_safe]]
+- [[ms2_spectrum]]
+- [[SmoothPeak]]

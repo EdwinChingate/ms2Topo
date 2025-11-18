@@ -1,16 +1,16 @@
 ## Description
 
- The `ChromPeaksModules` function takes grouped feature indices and returns the start and end retention times of each module, using the data from `SummaryChromPeaks`.
+The `ChromPeaksModules` function takes grouped feature indices and returns the start and end retention times of each module, using the data from `SummaryChromPeaks`.
 
 ---
 ## Key operations
 
-It iterates through the `Modules`, extracts the corresponding chromatographic peaks from `SummaryChromPeaks`, and determines the minimum and maximum retention times for each module.
+- It iterates through the `Modules`, extracts the corresponding chromatographic peaks from `SummaryChromPeaks`, and determines the minimum and maximum retention times for each module.
 
 ---
 ## Code
 
-```
+```python
 import numpy as np
 def ChromPeaksModules(SummaryChromPeaks,Modules,minSpec=10):
     ChromPeaks=[]
@@ -34,8 +34,8 @@ def ChromPeaksModules(SummaryChromPeaks,Modules,minSpec=10):
 ## Input
 
 - [[Modules]]
-- [[minSpec]]
 - [[SummaryChromPeaks]]
+- [[minSpec]]
 
 ---
 
