@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
-def Retrieve_csv_ms2Spectra(SummaryFile,ms2Folder,SFindicator='-ms2Summary.xlsx'):
+def Retrieve_csv_ms2Spectra(SummaryFile,ms2Folder,SFindicator='-ms2Summary.xlsx',minQuality=15):
     SummaryFileName=ms2Folder+'/'+SummaryFile
     SummMS2=np.array(pd.read_excel(SummaryFileName,index_col=0))
     ms2FolderName=SummaryFile.replace(SFindicator,'')
