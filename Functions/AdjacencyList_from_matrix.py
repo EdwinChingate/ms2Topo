@@ -1,11 +1,16 @@
 import numpy as np
-def AdjacencyList_from_matrix(AdjacencyMatrix,N_ms2_spectra,minAdjacency=0):
+from SplitConflicts import *
+def AdjacencyList_from_matrix(N_ms2_spectra,
+                              CosineMat,
+                              cos_tol=0):
     AdjacencyList=[]
-    ms2_ids=[]
-    for ms2_candidate_id in np.arange(N_ms2_spectra,dtype='int'):
-        Neigbours=np.where(AdjacencyMatrix[ms2_candidate_id,:]>minAdjacency)[0]
-        if len(Neigbours)>0:
-            ms2_ids.append(ms2_candidate_id)
+    ms2_ids = np.arange(N_ms2_spectra,dtype='int')
+    for ms2_candidate_id in ms2_ids:
+        Neigbours = np.where(CosineMat[ms2_candidate_id,:]>cos_tol)[0].tolist()+[int(ms2_candidate_id)]
+        feature_module,ConflictiveNodes = SplitConflicts(CosineMat = CosineMat[np.ix_(Neigbours,Neigbours)],
+                                                         feature_module = np.arange(len(Neigbours)).tolist(),
+                                                         cos_tol = cos_tol)
+        Neigbours = np.array(Neigbours)[feature_module].tolist()
         AdjacencyList.append(Neigbours)
-    ms2_ids=set(ms2_ids) 
+    ms2_ids = set(ms2_ids) 
     return [AdjacencyList,ms2_ids]
