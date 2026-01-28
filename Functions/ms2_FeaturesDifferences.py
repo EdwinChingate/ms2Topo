@@ -1,11 +1,13 @@
 from Retrieve_and_Join_ms2_for_feature import *
+from OverlappingClustering import *
 from AdjacencyList_ms2Fragments import *
-from ms2_feat_modules import *
+from CommunityBlocks import *
 from AligniningFragments_in_Feature import *
 from CosineMatrix import *
 from AdjacencyList_from_matrix import *
-from ms2_feat_modules import *
 from Update_ids_FeatureModules import *
+from ms2_feat_modules import *
+from AdjacencyList_ms2Fragments import *
 def ms2_FeaturesDifferences(All_FeaturesTable,
                             Feature_module,
                             SamplesNames,
@@ -14,7 +16,9 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                             ms2Folder = 'ms2_spectra',
                             ToAdd = 'mzML',
                             min_Int_Frac = 2,
-                            cos_tol = 0.9):
+                            cos_tol = 0.9,
+                            Norm2One = False,
+                            percentile = 10):
     All_ms2 = Retrieve_and_Join_ms2_for_feature(All_FeaturesTable = All_FeaturesTable,
                                                 Feature_module = Feature_module,
                                                 SamplesNames = SamplesNames,
@@ -22,7 +26,8 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                                                 ms2_spec_id_col = ms2_spec_id_col,
                                                 ms2Folder = ms2Folder,
                                                 ToAdd = ToAdd,
-                                                min_Int_Frac = min_Int_Frac)
+                                                min_Int_Frac = min_Int_Frac,
+                                                Norm2One = Norm2One)
     if len(All_ms2) == 0:
         return []
     AdjacencyListFragments,feat_ids = AdjacencyList_ms2Fragments(All_ms2 = All_ms2)
@@ -34,12 +39,14 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                                                          N_features = N_features)    
     CosineMat = CosineMatrix(AlignedFragmentsMat = AlignedFragmentsMat,
                              N_features = N_features)
-    AdjacencyList_Features,features_ids = AdjacencyList_from_matrix(AdjacencyMatrix = CosineMat,
+    AdjacencyList_Features,features_ids = AdjacencyList_from_matrix(CosineMat = CosineMat,
                                                                     N_ms2_spectra = N_features,
-                                                                    minAdjacency = cos_tol)
-    Feature_Modules = ms2_feat_modules(AdjacencyList = AdjacencyList_Features,
-                                       ms2_ids = features_ids)
+                                                                    cos_tol = cos_tol)
+    Feature_Modules = CommunityBlocks(AdjacencyList_Features = AdjacencyList_Features)
+    IntramoduleSimilarity,CompactCosineTen,Modules,ConflictiveNeighborsList = OverlappingClustering(Feature_Modules = Feature_Modules,
+                                                                                                    CosineMat = CosineMat.copy(),
+                                                                                                    percentile = percentile)    
     Feature_Modules = Update_ids_FeatureModules(Feature_module = Feature_module,
-                                                Feature_Modules = Feature_Modules,
+                                                Feature_Modules = Modules,
                                                 CosineMat = CosineMat)
     return Feature_Modules

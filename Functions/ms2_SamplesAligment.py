@@ -20,10 +20,10 @@ def ms2_SamplesAligment(ResultsFolder,
                         ms2Folder = 'ms2_spectra',
                         ToAdd = 'mzML',
                         saveAlignedTable = False,
-                        name = "SamplesAligment"):
+                        name = "SamplesAligment",
+                        Norm2One = True):
     home = os.getcwd()
     #ResultsFolder = home+'/'+ResultsFolderName
-    #replace with a new one for the All_SummMS2
     All_SummMS2Table,SamplesNames = JoiningSummMS2(ResultsFolder = ResultsFolder,
                                                    mz_min = mz_min-3*mz_Tol,
                                                    mz_max = mz_max+3*mz_Tol,
@@ -41,11 +41,12 @@ def ms2_SamplesAligment(ResultsFolder,
                                                ms2Folder = ms2Folder,
                                                ToAdd = ToAdd,
                                                min_Int_Frac = min_Int_Frac,
-                                               cos_tol = cos_tol)
+                                               cos_tol = cos_tol,
+                                               Norm2One = Norm2One)
     AlignedSamplesMat,ms2_ids_inModules = ms2GaussFeatStats(All_SummMS2Table = All_SummMS2Table,
                                                             SamplesNames = SamplesNames,
                                                             Modules = Modules,
-                                                            min_ms2_spectra = 4)    
+                                                            min_ms2_spectra = 4)        
     #This could become its own function for saving and formating 
     Write_ms2ids(features_ids = AlignedSamplesMat[:,11],
                  ms2_ids_inModules = ms2_ids_inModules,
@@ -61,4 +62,3 @@ def ms2_SamplesAligment(ResultsFolder,
         name = name+"_"+string_date+'.xlsx'
         AlignedSamplesDF.to_excel(name)
     return AlignedSamplesDF
-

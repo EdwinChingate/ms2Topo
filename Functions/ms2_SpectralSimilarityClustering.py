@@ -15,7 +15,8 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                      ms2Folder = 'ms2_spectra',
                                      ToAdd = 'mzML',
                                      min_Int_Frac = 2,
-                                     cos_tol = 0.9):
+                                     cos_tol = 0.9,
+                                     Norm2One = False):
     if len(SamplesNames) == 0:
         SamplesNames = [SampleName]
     AdjacencyList,feat_ids = AdjacencyListFeatures(MS2_features = SummMS2_raw,
@@ -35,6 +36,7 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                                   ms2Folder = ms2Folder,
                                                   ToAdd = ToAdd,
                                                   min_Int_Frac = min_Int_Frac,
-                                                  cos_tol = cos_tol)
+                                                  cos_tol = cos_tol,
+                                                  Norm2One = Norm2One)
         Modules += Feature_Modules
     return Modules

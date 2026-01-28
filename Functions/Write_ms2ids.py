@@ -6,5 +6,5 @@ def Write_ms2ids(features_ids,
     for feature_id in features_ids:
         feature_ms2s_table = ms2_ids_inModules[int(feature_id)]
         feature_ms2sDF = pd.DataFrame(feature_ms2s_table,columns = ['ms2_id','Sample_id'])
-        FeatureClusterLoc = AligningFolder +'/'+str(feature_id) + '.csv'
+        FeatureClusterLoc = AligningFolder +'/'+str(int(feature_id)) + '.csv'
         feature_ms2sDF.to_csv(FeatureClusterLoc)
