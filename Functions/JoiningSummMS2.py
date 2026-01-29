@@ -30,4 +30,3 @@ def JoiningSummMS2(ResultsFolder,
     Filter = (All_SummMS2Table[:,1]>mz_min)&(All_SummMS2Table[:,1]<mz_max)&(All_SummMS2Table[:,2]>RT_min)&(All_SummMS2Table[:,2]<RT_max)
     All_SummMS2Table = All_SummMS2Table[Filter,:]
     return [All_SummMS2Table,SamplesNames]
-

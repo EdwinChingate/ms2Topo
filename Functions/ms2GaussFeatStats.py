@@ -9,13 +9,13 @@ def ms2GaussFeatStats(All_SummMS2Table,
     AlignedSamplesMat = np.zeros((N_Features,N_samples+12))
     ms2_ids_inModules = []
     for feature_id in np.arange(N_Features,dtype = 'int'):
-        Feature_module = Modules[feature_id][0]
+        Feature_module = Modules[feature_id]
         FeatureTable = All_SummMS2Table[Feature_module,:]
         AlignedSamplesMat[feature_id,0] = np.mean(FeatureTable[:,1])
         AlignedSamplesMat[feature_id,1] = np.std(FeatureTable[:,1])
         AlignedSamplesMat[feature_id,2] = len(Feature_module)
-        AlignedSamplesMat[feature_id,3] = Modules[feature_id][1][0]
-        AlignedSamplesMat[feature_id,4] = Modules[feature_id][1][1]
+        AlignedSamplesMat[feature_id,3] = 0
+        AlignedSamplesMat[feature_id,4] = 0
         AlignedSamplesMat[feature_id,8] = np.mean(FeatureTable[:,2])
         AlignedSamplesMat[feature_id,9] = np.min(FeatureTable[:,2])
         AlignedSamplesMat[feature_id,10] = np.max(FeatureTable[:,2])
@@ -34,5 +34,3 @@ def ms2GaussFeatStats(All_SummMS2Table,
     AlignedSamplesMat[:,7] = AlignedSamplesMat[:,6]/AlignedSamplesMat[:,0]*1e6    
     AlignedSamplesMat = AlignedSamplesMat[AlignedSamplesMat[:,0].argsort()]    
     return [AlignedSamplesMat,ms2_ids_inModules]
-
-    

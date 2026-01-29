@@ -16,8 +16,7 @@ def OverlappingClustering(Feature_Modules,
         CompactCosineTen = CompressCosineMatrix(Modules = Modules,
                                                 CosineMat = CosineMat.copy(),
                                                 percentile = percentile)
-        AdjacencyList,AdjacencyMatrix,module_ids = AdjacentOverlappingModules(Modules = Modules,
-                                                                              IntramoduleSimilarity = IntramoduleSimilarity,
+        AdjacencyList,AdjacencyMatrix,module_ids = AdjacentOverlappingModules(IntramoduleSimilarity = IntramoduleSimilarity,
                                                                               CompactCosineTen = CompactCosineTen)
         NewAdjacencyList,ConflictiveNeighborsList = CompactNeighbourhood(AdjacencyList = AdjacencyList.copy(),
                                                                          AdjacencyMatrix = AdjacencyMatrix.copy(),

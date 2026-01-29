@@ -11,9 +11,10 @@ def SplitConflicts(CosineMat,
     ConflictVec,ConflictsMat = ConflictsHubs(ConflictsMat = ConflictsMat)
     while sum(ConflictVec) > 0:
         MostConflicts = np.max(ConflictVec)
-        MostConflictive = int(np.where(ConflictVec == MostConflicts)[0][0])
+        MostConflictive = int(np.where(ConflictVec == MostConflicts)[0][0])        
         ConflictiveNodes.append(MostConflictive)
-        feature_module.remove(MostConflictive)
         ConflictVec,ConflictsMat = ConflictsHubs(ConflictsMat = ConflictsMat,
                                                  conflict_spectra = MostConflictive)
-    return [feature_module,ConflictiveNodes]
+    if len(ConflictiveNodes) > 0:
+        feature_module = list(set(feature_module) - set(ConflictiveNodes))
+    return feature_module

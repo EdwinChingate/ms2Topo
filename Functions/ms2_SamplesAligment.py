@@ -7,7 +7,7 @@ from ms2_SpectralSimilarityClustering import *
 from ms2GaussFeatStats import *
 from Write_ms2ids import *
 def ms2_SamplesAligment(ResultsFolder,
-                        mz_min = 250,
+                        mz_min = 254,
                         mz_max = 255,
                         RT_min = 0,
                         RT_max = 2000,
@@ -43,6 +43,7 @@ def ms2_SamplesAligment(ResultsFolder,
                                                min_Int_Frac = min_Int_Frac,
                                                cos_tol = cos_tol,
                                                Norm2One = Norm2One)
+
     AlignedSamplesMat,ms2_ids_inModules = ms2GaussFeatStats(All_SummMS2Table = All_SummMS2Table,
                                                             SamplesNames = SamplesNames,
                                                             Modules = Modules,

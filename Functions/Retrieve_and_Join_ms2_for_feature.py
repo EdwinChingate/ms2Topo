@@ -28,8 +28,8 @@ def Retrieve_and_Join_ms2_for_feature(All_FeaturesTable,
             ms2_spectrumDF = pd.read_csv(ms2_spectrumLoc,index_col = 0)
             ms2_spectrum = np.array(ms2_spectrumDF)      
             if Norm2One:
-                TotalRelativeIntensity = np.sum(ms2_spectrum[:,9])
-                ms2_spectrum[:,9] = ms2_spectrum[:,9]/TotalRelativeIntensity
+                Norm = np.sqrt(np.sum(ms2_spectrum[:,9]*ms2_spectrum[:,9]))
+                ms2_spectrum[:,9] = ms2_spectrum[:,9]/Norm
             N_peaks = len(ms2_spectrum[:,0])
             SpectrumLocVec = np.ones(N_peaks).reshape(-1,1)*feature_id
             ms2_spectrum = np.append(ms2_spectrum,SpectrumLocVec,axis = 1)
@@ -41,7 +41,7 @@ def Retrieve_and_Join_ms2_for_feature(All_FeaturesTable,
     if len(All_ms2) == 0:
         return []                
     if Norm2One:
-        min_Int_Frac = min_Int_Frac/TotalRelativeIntensity
+        min_Int_Frac = min_Int_Frac/Norm
     IntFrac_ms2_filter = All_ms2[:,9]>min_Int_Frac
     All_ms2 = All_ms2[IntFrac_ms2_filter,:]    
     return All_ms2
