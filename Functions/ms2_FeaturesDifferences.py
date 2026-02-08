@@ -48,5 +48,5 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                                                                                                     CosineMat = CosineMat.copy(),
                                                                                                     percentile = percentile)    
     Feature_Modules = Update_ids_FeatureModules(Feature_module = Feature_module,
-                                                Feature_Modules = Feature_Modules)
+                                                Feature_Modules = Modules)
     return Feature_Modules
