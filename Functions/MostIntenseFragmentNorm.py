@@ -9,8 +9,20 @@ def MostIntenseFragmentNorm(consensus_spectra):
         maxIntFragLoc = maxIntFragLoc[0]
     NormIntenseVec = 100 * consensus_spectra[:, 6] / consensus_spectra[maxIntFragLoc, 6]
     NormIntenseVec = NormIntenseVec.reshape(-1, 1)
-    NormIntenseCIVec = 100 * consensus_spectra[:, 8] / consensus_spectra[maxIntFragLoc, 6]
-    NormIntenseCIVec = NormIntenseCIVec.reshape(-1, 1)
+    min_NormIntenseVec = 100 * consensus_spectra[:, 7] / consensus_spectra[maxIntFragLoc, 6]
+    min_NormIntenseVec = min_NormIntenseVec.reshape(-1, 1)
+    max_NormIntenseVec = 100 * consensus_spectra[:, 8] / consensus_spectra[maxIntFragLoc, 6]
+    max_NormIntenseVec = max_NormIntenseVec.reshape(-1, 1)
+    median_NormIntenseVec = 100 * consensus_spectra[:, 14] / consensus_spectra[maxIntFragLoc, 6]
+    median_NormIntenseVec = median_NormIntenseVec.reshape(-1, 1)    
+    NormIntenseVec_Q1 = 100 * consensus_spectra[:, 15] / consensus_spectra[maxIntFragLoc, 6]
+    NormIntenseVec_Q1 = NormIntenseVec_Q1.reshape(-1, 1)
+    NormIntenseVec_Q3 = 100 * consensus_spectra[:, 16] / consensus_spectra[maxIntFragLoc, 6]
+    NormIntenseVec_Q3 = NormIntenseVec_Q3.reshape(-1, 1)    
     consensus_spectra = np.hstack((consensus_spectra, NormIntenseVec))
-    consensus_spectra = np.hstack((consensus_spectra, NormIntenseCIVec))
+    consensus_spectra = np.hstack((consensus_spectra, min_NormIntenseVec))
+    consensus_spectra = np.hstack((consensus_spectra, max_NormIntenseVec))
+    consensus_spectra = np.hstack((consensus_spectra, median_NormIntenseVec))
+    consensus_spectra = np.hstack((consensus_spectra, NormIntenseVec_Q1))
+    consensus_spectra = np.hstack((consensus_spectra, NormIntenseVec_Q3))    
     return consensus_spectra
