@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from AdjacencyListFeatures import *
 from ms2_feat_modules import *
-from ms2_FeaturesDifferences import *
+#from ms2_FeaturesDifferences import *
 def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                      SampleName = '',
                                      SamplesNames = [],
@@ -26,15 +26,19 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
     RawModules = ms2_feat_modules(AdjacencyList = AdjacencyList,
                                   ms2_ids = feat_ids)
     Modules = []
+    feature_id = 0
+    AlignedSamplesList = []
     for Feature_module in RawModules:
-        Feature_Modules = ms2_FeaturesDifferences(All_FeaturesTable = SummMS2_raw,
-                                                  Feature_module = Feature_module,
-                                                  SamplesNames = SamplesNames,
-                                                  sample_id_col = sample_id_col,
-                                                  ms2_spec_id_col = ms2_spec_id_col,
-                                                  ms2Folder = ms2Folder,
-                                                  ToAdd = ToAdd,
-                                                  cos_tol = cos_tol,
-                                                  Norm2One = Norm2One)
+        Feature_Modules, feature_id, AlignedSamplesList = ms2_FeaturesDifferences(All_FeaturesTable = SummMS2_raw,
+                                                              Feature_module = Feature_module,
+                                                              AlignedSamplesList = AlignedSamplesList,
+                                                              SamplesNames = SamplesNames,
+                                                              sample_id_col = sample_id_col,
+                                                              ms2_spec_id_col = ms2_spec_id_col,
+                                                              ms2Folder = ms2Folder,
+                                                              ToAdd = ToAdd,
+                                                              cos_tol = cos_tol,
+                                                              Norm2One = Norm2One,
+                                                              feature_id = feature_id)
         Modules += Feature_Modules
     return Modules

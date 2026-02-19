@@ -3,9 +3,8 @@ import pandas as pd
 import os
 import datetime
 from JoiningSummMS2 import *
-from ms2_SpectralSimilarityClustering import *
-from ms2GaussFeatStats import *
-from Write_ms2ids import *
+#from ms2_SpectralSimilarityClustering import *
+#from Write_ms2ids import *
 def ms2_SamplesAligment(ResultsFolder,
                         mz_min = 254,
                         mz_max = 255,
@@ -23,12 +22,12 @@ def ms2_SamplesAligment(ResultsFolder,
                         Norm2One = True):
     home = os.getcwd()
     #ResultsFolder = home+'/'+ResultsFolderName
-    All_SummMS2Table,SamplesNames = JoiningSummMS2(ResultsFolder = ResultsFolder,
-                                                   mz_min = mz_min-3*mz_Tol,
-                                                   mz_max = mz_max+3*mz_Tol,
-                                                   RT_min = RT_min,
-                                                   RT_max = RT_max,
-                                                   ToReplace = ToReplace)
+    All_SummMS2Table, SamplesNames = JoiningSummMS2(ResultsFolder = ResultsFolder,
+                                                    mz_min = mz_min-3*mz_Tol,
+                                                    mz_max = mz_max+3*mz_Tol,
+                                                    RT_min = RT_min,
+                                                    RT_max = RT_max,
+                                                    ToReplace = ToReplace)
     Modules = ms2_SpectralSimilarityClustering(SummMS2_raw = All_SummMS2Table,
                                                SamplesNames = SamplesNames,
                                                mz_col = 1,
@@ -40,19 +39,22 @@ def ms2_SamplesAligment(ResultsFolder,
                                                ms2Folder = ms2Folder,
                                                ToAdd = ToAdd,
                                                cos_tol = cos_tol,
-                                               Norm2One = Norm2One)
+                                               Norm2One = Norm2One)     
+    Columns = ['mz_(Da)',
+               'mz_std_(Da)',
+               'N_ms2-spectra',
+               'mean CosSim',
+               'std CosSim',
+               'Normal test',
+               'mz_ConfidenceInterval_(Da)',
+               'mz_ConfidenceInterval_(ppm)',
+               'RT_(s)',
+               'min_RT_(s)',
+               'max_RT_(s)',
+               'feat_id']
+    Columns = Columns + SamplesNames 
 
-    AlignedSamplesMat,ms2_ids_inModules = ms2GaussFeatStats(All_SummMS2Table = All_SummMS2Table,
-                                                            SamplesNames = SamplesNames,
-                                                            Modules = Modules,
-                                                            min_ms2_spectra = 4)        
-    #This could become its own function for saving and formating 
-    Write_ms2ids(features_ids = AlignedSamplesMat[:,11],
-                 ms2_ids_inModules = ms2_ids_inModules,
-                 AligningFolder = 'Alignedms2Features')    
-    
-    Columns = ['mz_(Da)','mz_std_(Da)', 'N_ms2-spectra','mean CosSim','std CosSim','Normal test','mz_ConfidenceInterval_(Da)','mz_ConfidenceInterval_(ppm)','RT_(s)','min_RT_(s)','max_RT_(s)','feat_id']+SamplesNames
-    AlignedSamplesDF = pd.DataFrame(AlignedSamplesMat,columns = Columns)
+    #AlignedSamplesDF = pd.DataFrame(AlignedSamplesMat,columns = Columns)
     if saveAlignedTable:
         date = datetime.datetime.now()
         string_date = str(date)
