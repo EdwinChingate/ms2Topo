@@ -1,3 +1,5 @@
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+
 # ms2Topo
 
 **Topology-Driven MS2 Feature Extraction for DDA Mass Spectrometry**
