@@ -14,7 +14,7 @@ def FeatureModuleStats(All_FeaturesTable,
                            dtype = 'int')
     Samples_ids = set(list(Samples_ids))
     Samples_ids = np.array(list(Samples_ids))
-    AlignedSamplesVec_loc = Samples_ids + 17
+    AlignedSamplesVec_loc = Samples_ids + 18
     AlignedSamplesVec[AlignedSamplesVec_loc] = 1    
     mz = np.median(FeatureTable[:, 1])
     AlignedSamplesVec[0] = mz
