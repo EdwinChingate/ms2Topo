@@ -1,7 +1,6 @@
+from __future__ import annotations
 from ms2_SpectralSimilarityClustering import *
 
-import numpy as np
-from ConsensusSpectra import *
 def ms2_SamplesAligment(ProjectName,
                         All_SummMS2Table,
                         EdgesMat,

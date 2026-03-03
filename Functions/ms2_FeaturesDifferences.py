@@ -1,7 +1,7 @@
+from __future__ import annotations
 from FeatureClusterData import *
+from Update_ids_FeatureModules import *
 
-import numpy as np
-from ConsensusSpectra import *
 def ms2_FeaturesDifferences(All_FeaturesTable,
                             Feature_module,
                             SamplesNames,

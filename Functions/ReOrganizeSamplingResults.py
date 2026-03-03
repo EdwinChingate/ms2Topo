@@ -1,5 +1,7 @@
-import numpy as np
+from __future__ import annotations
 from ConsensusSpectra import *
+import pandas as pd
+
 def ReOrganizeSamplingResults(feature_clusterList,
                               min_spectra = 3,
                               percentile_mz = 5,

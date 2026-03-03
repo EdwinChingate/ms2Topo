@@ -1,7 +1,7 @@
+from __future__ import annotations
+from CosineOverlappingClustering import *
 from SummarizeSampling import *
 
-import numpy as np
-from ConsensusSpectra import *
 def CosineSamplingOverlappingClustering(Feature_module,
                                         All_FeaturesTable,
                                         SamplesNames,
