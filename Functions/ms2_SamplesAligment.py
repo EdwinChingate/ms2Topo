@@ -33,7 +33,6 @@ def ms2_SamplesAligment(ProjectName,
                                                                         Norm2One = Norm2One)     
         TableLoc = ProjectName + '-' + str(slice_id) + '.csv'
         #AlignedSamplesDF.to_csv(TableLoc)
-    return AlignedSamplesDF        
+    return AlignedSamplesDF
     
-    
-                                                            
+                                        

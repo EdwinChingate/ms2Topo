@@ -17,4 +17,4 @@ def best_merging4silhouette(CosineMat,
         
     best_silhouette_loc = int(np.argmax(mean_silhouette_meta_vector))
 
-    return modules_space[best_silhouette_loc]
+    return [modules_space[best_silhouette_loc], mean_silhouette_meta_vector[best_silhouette_loc]]
