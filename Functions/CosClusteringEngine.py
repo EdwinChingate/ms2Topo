@@ -1,8 +1,11 @@
+from __future__ import annotations
+from AdjacencyList_from_matrix import *
 from AlignFragmentsEngine import *
 from CosineMatrix import *
-from AdjacencyList_from_matrix import *
-from CommunityBlocks import *
 from OverlappingClustering import *
+import numpy as np
+from silhouette_overlapping import *
+
 def CosClusteringEngine(All_FeaturesTable,
                         All_ms2,
                         Feature_module,
@@ -20,10 +23,12 @@ def CosClusteringEngine(All_FeaturesTable,
     AdjacencyList_Features, features_ids = AdjacencyList_from_matrix(CosineMat = CosineMat,
                                                                      N_ms2_spectra = N_features,
                                                                      cos_tol = cos_tol)
-    Feature_Modules = CommunityBlocks(AdjacencyList_Features = AdjacencyList_Features)
-    Modules, IntramoduleSimilarity = OverlappingClustering(Feature_Modules = Feature_Modules,
-                                                           CosineMat = CosineMat.copy(),
-                                                           percentile = percentile)   
+    modules = silhouette_overlapping(AdjacencyList_Features = AdjacencyList_Features,
+                                     CosineMat = CosineMat)
+    Modules, IntramoduleSimilarity, CompactCosineTen = OverlappingClustering(Feature_Modules = modules,
+                                                                             CosineMat = CosineMat.copy(),
+                                                                             percentile = percentile)  
+     
     This_Module_FeaturesTable = np.hstack((All_FeaturesTable[Feature_module, :].copy(),
                                            Explained_fractionInt))
     This_Module_FeaturesTable = np.hstack((This_Module_FeaturesTable,
@@ -34,4 +39,5 @@ def CosClusteringEngine(All_FeaturesTable,
                             This_Module_FeaturesTable,
                             AlignedFragmentsMat,
                             AlignedFragments_mz_Mat]  
+                            
     return feature_cluster_data

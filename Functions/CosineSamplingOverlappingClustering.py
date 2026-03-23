@@ -1,6 +1,7 @@
 from __future__ import annotations
 from CosineOverlappingClustering import *
 from SummarizeSampling import *
+import numpy as np
 
 def CosineSamplingOverlappingClustering(Feature_module,
                                         All_FeaturesTable,
@@ -67,4 +68,5 @@ def CosineSamplingOverlappingClustering(Feature_module,
                                              ms2Folder = ms2Folder,
                                              ToAdd = ToAdd,
                                              Norm2One = Norm2One)    
+                                             
     return feature_cluster_data

@@ -1,9 +1,11 @@
-from CommunityBlocks import *
-from IntramoduleSimilarityCalc import *
-from CompressCosineMatrix import *
+from __future__ import annotations
 from AdjacentOverlappingModules import *
+from CommunityBlocks import *
 from CompactNeighbourhood import *
+from CompressCosineMatrix import *
+from IntramoduleSimilarityCalc import *
 from UpdateModulesAfterClustering import *
+
 def OverlappingClustering(Feature_Modules,
                           CosineMat,
                           percentile = 10):
@@ -18,6 +20,7 @@ def OverlappingClustering(Feature_Modules,
                                                 percentile = percentile)
         AdjacencyList,AdjacencyMatrix,module_ids = AdjacentOverlappingModules(IntramoduleSimilarity = IntramoduleSimilarity,
                                                                               CompactCosineTen = CompactCosineTen)
+
         NewAdjacencyList,ConflictiveNeighborsList = CompactNeighbourhood(AdjacencyList = AdjacencyList.copy(),
                                                                          AdjacencyMatrix = AdjacencyMatrix.copy(),
                                                                          CosineMat = CompactCosineTen[:,:,1])        
@@ -26,4 +29,4 @@ def OverlappingClustering(Feature_Modules,
         modulesDif = len(Modules) - len(New_Modules)        
         Modules = UpdateModulesAfterClustering(New_Modules = New_Modules,
                                                Modules = Modules)   
-    return [Modules, IntramoduleSimilarity]
+    return [Modules, IntramoduleSimilarity, CompactCosineTen]

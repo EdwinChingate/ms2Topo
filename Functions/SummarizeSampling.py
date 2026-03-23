@@ -18,7 +18,7 @@ def SummarizeSampling(feature_clusterList,
                       ms2_spec_id_col = 15,
                       percentile_mz = 5,
                       percentile_Int = 10,
-                      Nspectra_sampling = 3,      # ← ADDED: needed by Retrieve_ms2_afterSampling
+                      Nspectra_sampling = 3,     
                       ms2Folder = 'ms2_spectra',
                       ToAdd = 'mzML',
                       Norm2One = False):
@@ -52,8 +52,8 @@ def SummarizeSampling(feature_clusterList,
                                              Explained_fractionInt = Explained_fractionInt,
                                              slice_id = slice_id)
     
-    Modules, BigFeature_Module, IntramoduleSimilarityModulesMat, _, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data  # ← ADDED: unpack for downstream use
-    N_modules = len(Modules)  # ← ADDED: needed by ContrastSamplesCentroids
+    Modules, BigFeature_Module, IntramoduleSimilarityModulesMat, _, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data 
+    N_modules = len(Modules) 
 
     Samples_FeaturesIdsList, Samples_ids2Check = FeaturesTableSamples2Check(Feature_Module = BigFeature_Module,
                                                                             Original_Feature_module = Original_Feature_module,
@@ -61,7 +61,7 @@ def SummarizeSampling(feature_clusterList,
                                                                             sample_id_col = sample_id_col)
 
     if len(Samples_ids2Check) == 0:
-        return feature_cluster_data  # ← FIXED: was returning before FormattingSummary
+        return feature_cluster_data  
 
     feature_cluster_data = EvaluateRemainingAnalyticalSamples(Samples_FeaturesIdsList = Samples_FeaturesIdsList,
                                                               Samples_ids2Check = Samples_ids2Check,
@@ -76,6 +76,7 @@ def SummarizeSampling(feature_clusterList,
                                                               ToAdd = ToAdd,
                                                               Norm2One = Norm2One,
                                                               Nspectra_sampling = Nspectra_sampling,
-                                                              std_distance = 3,      # Hardcoded in your previous snippet, could be param
+                                                              std_distance = 3,     
                                                               ppm_tol = 20)
+                                                              
     return feature_cluster_data

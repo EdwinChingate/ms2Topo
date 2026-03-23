@@ -1,8 +1,6 @@
-from overlapping2modules import *
+from __future__ import annotations
+import numpy as np
+
 def overlapping_modules_vector_crafter(module_1,
-                                       AdjacencyList_Features):
-    overlapping_modules = lambda module: overlapping2modules(module_1 = module_1,
-                                                             module_2 = module)
-    overlapping_modules_vector = list(map(overlapping_modules,
-                                          AdjacencyList_Features))
-    return overlapping_modules_vector
+                                       modules):
+    return np.array([[len(set(module_1) & set(module_2)), len(set(module_1) ^ set(module_2)), set(module_1) & set(module_2), set(module_1) ^ set(module_2)] for module_2 in modules])
