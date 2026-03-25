@@ -1,6 +1,7 @@
 from __future__ import annotations
 from CosineOverlappingClustering import *
 from SummarizeSampling import *
+import numpy as np
 
 def CosineSamplingOverlappingClustering(Feature_module,
                                         All_FeaturesTable,
@@ -23,7 +24,11 @@ def CosineSamplingOverlappingClustering(Feature_module,
                                         Norm2One = False):
     feature_clusterList = []
     sampling = 0
-    while sampling < SamplingTimes:
+    max_attempts = SamplingTimes * 5 
+    attempts = 0
+    
+    while sampling < SamplingTimes and attempts < max_attempts:
+        attempts += 1
         rng = np.random.default_rng()
         Sample_Feature_module = rng.choice(Feature_module,
                                            size = Nspectra_sampling)
@@ -43,7 +48,10 @@ def CosineSamplingOverlappingClustering(Feature_module,
         if len(feature_cluster_data) > 0:         
             feature_clusterList.append(feature_cluster_data)   
             sampling += 1
-                                   
+
+    if len(feature_clusterList) == 0:
+        return []
+            
     feature_cluster_data = SummarizeSampling(feature_clusterList = feature_clusterList,
                                              All_FeaturesTable = All_FeaturesTable.copy(),
                                              Original_Feature_module = Feature_module,
@@ -60,4 +68,5 @@ def CosineSamplingOverlappingClustering(Feature_module,
                                              ms2Folder = ms2Folder,
                                              ToAdd = ToAdd,
                                              Norm2One = Norm2One)    
+                                             
     return feature_cluster_data

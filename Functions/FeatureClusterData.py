@@ -20,6 +20,7 @@ def FeatureClusterData(Feature_module,
                        ms2Folder = 'ms2_spectra',
                        ToAdd = 'mzML',
                        Norm2One = False):
+    
     if len(Feature_module) < max_Nspectra_cluster:
         feature_cluster_data = CosineOverlappingClustering(All_FeaturesTable = All_FeaturesTable,
                                                            Feature_module = Feature_module,
@@ -34,7 +35,9 @@ def FeatureClusterData(Feature_module,
                                                            ToAdd = ToAdd,
                                                            Norm2One = Norm2One,
                                                            Intensity_to_explain = Intensity_to_explain)  
+        
         return [feature_cluster_data, 0]
+        
     feature_cluster_data = CosineSamplingOverlappingClustering(All_FeaturesTable = All_FeaturesTable,
                                                                Feature_module = Feature_module,
                                                                sample_id_col = sample_id_col,
@@ -51,5 +54,6 @@ def FeatureClusterData(Feature_module,
                                                                percentile_Int = percentile_Int,
                                                                SamplingTimes = SamplingTimes,
                                                                Intensity_to_explain = Intensity_to_explain)
+    
     
     return [feature_cluster_data, 1]

@@ -14,6 +14,7 @@ def ms2_SamplesAligment(ProjectName,
                         ms2Folder = 'ms2_spectra',
                         ToAdd = 'mzML',
                         Norm2One = True):
+                        
     for Low_id_mz, High_id_mz, slice_id in EdgesMat:
         SummMS2_raw = All_SummMS2Table[Low_id_mz: High_id_mz, :]
         AlignedSamplesDF, feature_id = ms2_SpectralSimilarityClustering(SummMS2_raw = SummMS2_raw,
@@ -31,4 +32,8 @@ def ms2_SamplesAligment(ProjectName,
                                                                         cos_tol = cos_tol,
                                                                         Norm2One = Norm2One)     
         TableLoc = ProjectName + '-' + str(slice_id) + '.csv'
-        AlignedSamplesDF.to_csv(TableLoc)
+        #AlignedSamplesDF.to_csv(TableLoc)
+    return AlignedSamplesDF
+    
+    
+                    
