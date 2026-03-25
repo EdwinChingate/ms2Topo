@@ -4,6 +4,7 @@ from CosineOverlappingClustering import *
 from Retrieve_and_Join_ms2_for_feature import *
 from UpdateIntramoduleSimilarityAfterClustering import *
 from UpdateUniqueModulesAfterClustering import *
+import numpy as np
 
 def ClusteringSamplingModules(All_consensus_ms2,      
                               ModulesList,            

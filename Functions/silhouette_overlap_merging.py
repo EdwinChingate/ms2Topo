@@ -19,10 +19,6 @@ def silhouette_overlap_merging(CosineMat,
     CompactCosineTen = CompressCosineMatrix(Modules = modules,
                                             CosineMat = CosineMat.copy(),
                                             percentile = percentile)
-    print('CompactCosineTen')
-    ShowDF(CompactCosineTen[:, :, 2])
-    print('IntramoduleSimilarity')
-    ShowDF(IntramoduleSimilarity)
     
     modules, current_silhouette, modules_explored_count = explore_similarity_overlapping(modules = modules,
                                                                                          current_silhouette = current_silhouette,

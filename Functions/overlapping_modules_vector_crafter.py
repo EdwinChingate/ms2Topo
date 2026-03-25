@@ -3,4 +3,4 @@ import numpy as np
 
 def overlapping_modules_vector_crafter(module_1,
                                        modules):
-    return np.array([[len(set(module_1) & set(module_2)), len(set(module_1) ^ set(module_2)), set(module_1) & set(module_2), set(module_1) ^ set(module_2)] for module_2 in modules])
+    return np.array([[module_1.issubset(module_2), module_2.issubset(module_1)] for module_2 in modules])

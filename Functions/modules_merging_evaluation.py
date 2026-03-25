@@ -18,11 +18,7 @@ def modules_merging_evaluation(module_1_id,
     silhouette_vector = silhouette_vector_calculator(CosineMat = CosineMat,
                                                      modules = new_modules)  
     silhouette = np.mean(silhouette_vector)
-    print(module_1_id,module_2_id)
-    print(module_1,module_2)
-    print("silhouette")
-    print(silhouette, current_silhouette)
-    
+
     if silhouette > current_silhouette:
         return [new_modules, silhouette, True]
     

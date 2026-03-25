@@ -15,10 +15,12 @@ def silhouette_merging(CosineMat,
     modules_space = modules_space_crafter(module_1_id = module_1_id,
                                           overlapping_vector = overlapping_vector,
                                           modules = modules)
+    if len(modules_space) == 1:
+        modules = modules_space[0]
+    else:
+        modules, current_silhouette = best_merging4silhouette(CosineMat = CosineMat,
+                                                              modules_space = modules_space)
     
-    modules, current_silhouette = best_merging4silhouette(CosineMat = CosineMat,
-                                                          modules_space = modules_space)
-        
     modules, current_silhouette = silhouette_merging(CosineMat = CosineMat,
                                                      modules = modules,
                                                      current_silhouette = current_silhouette) 

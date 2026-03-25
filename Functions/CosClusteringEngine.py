@@ -2,10 +2,9 @@ from __future__ import annotations
 from AdjacencyList_from_matrix import *
 from AlignFragmentsEngine import *
 from CosineMatrix import *
-from ShowDF import *
+import numpy as np
 from silhouette_overlap_merging import *
 from silhouette_overlapping import *
-from ShowDF import *
 
 def CosClusteringEngine(All_FeaturesTable,
                         All_ms2,
@@ -15,6 +14,7 @@ def CosClusteringEngine(All_FeaturesTable,
                         min_spectra = 3,
                         cos_tol = 0.9,
                         percentile = 10):
+    
     AlignedFragmentsMat, AlignedFragments_mz_Mat, Explained_fractionInt, N_features = AlignFragmentsEngine(All_ms2 = All_ms2,
                                                                                                            Feature_module = Feature_module,
                                                                                                            Intensity_to_explain = Intensity_to_explain,
@@ -33,8 +33,6 @@ def CosClusteringEngine(All_FeaturesTable,
                                                                                   cos_tol = cos_tol)  
 
     Modules = [list(module) for module in modules]
-    ShowDF(CompactCosineTen[:, :, 2])
-    ShowDF(IntramoduleSimilarity)
     This_Module_FeaturesTable = np.hstack((All_FeaturesTable[Feature_module, :].copy(),
                                            Explained_fractionInt))
     This_Module_FeaturesTable = np.hstack((This_Module_FeaturesTable,
