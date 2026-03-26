@@ -4,7 +4,7 @@ def FormattingSummary(feature_cluster_data,
                       Explained_fractionInt,
                       slice_id):
 
-    Modules, Feature_Module, IntramoduleSimilarity, All_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data  # ← FIXED: Feature_module → Feature_Module (consistent naming)
+    Modules, Feature_Module, IntramoduleSimilarity, All_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data 
 
     BigExplained_fractionIntVec = np.zeros(len(All_FeaturesTable)).reshape(-1, 1)
     BigExplained_fractionIntVec[Feature_Module] = Explained_fractionInt
@@ -33,5 +33,7 @@ def FormattingSummary(feature_cluster_data,
                             IntramoduleSimilarity,
                             This_Module_FeaturesTable,
                             BigAlignedFragmentsMat,
-                            BigAlignedFragments_mz_Mat]
+                            BigAlignedFragments_mz_Mat,
+                            modules_silhouette_summary_table]
+    
     return feature_cluster_data

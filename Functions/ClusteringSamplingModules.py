@@ -4,7 +4,8 @@ from CosineOverlappingClustering import *
 from Retrieve_and_Join_ms2_for_feature import *
 from UpdateIntramoduleSimilarityAfterClustering import *
 from UpdateUniqueModulesAfterClustering import *
-import numpy as np
+from update_silhouette_summary_table_after_clustering import *
+
 
 def ClusteringSamplingModules(All_consensus_ms2,      
                               ModulesList,            
@@ -12,6 +13,7 @@ def ClusteringSamplingModules(All_consensus_ms2,
                               BigFeature_Module,      
                               All_FeaturesTable,
                               SamplesNames,
+                              modules_silhouette_summary_tables_list,
                               min_spectra = 3,
                               Intensity_to_explain = 0.9,
                               cos_tol = 0.9,
@@ -34,10 +36,13 @@ def ClusteringSamplingModules(All_consensus_ms2,
                                                        percentile = percentile,
                                                        slice_id = slice_id)   
 
-    Modules, Feature_Module, IntramoduleSimilarity, This_Module_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data
+    Modules, Feature_Module, IntramoduleSimilarity, This_Module_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data
 
     IntramoduleSimilarityModulesMat = UpdateIntramoduleSimilarityAfterClustering(Modules = Modules,
                                                                                  IntramoduleSimilarityList = IntramoduleSimilarityList)
+   
+    sampling_modules_silhouette_summary_table = update_silhouette_summary_table_after_clustering(modules = Modules,
+                                                                                                 modules_silhouette_summary_tables_list = modules_silhouette_summary_tables_list)
 
     Modules = UpdateUniqueModulesAfterClustering(New_Modules = Modules,
                                                  Modules = ModulesList)
@@ -61,6 +66,7 @@ def ClusteringSamplingModules(All_consensus_ms2,
                             IntramoduleSimilarityModulesMat,
                             All_FeaturesTable,
                             AlignedFragmentsMat,
-                            AlignedFragments_mz_Mat]
+                            AlignedFragments_mz_Mat,
+                            sampling_modules_silhouette_summary_table]
                             
     return [feature_cluster_data, Explained_fractionInt]

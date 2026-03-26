@@ -2,7 +2,7 @@ from __future__ import annotations
 from similarity_overlaps_finder import *
 
 def explore_similarity_overlapping(modules,
-                                   current_silhouette,
+                                   silhouette_vector,
                                    IntramoduleSimilarity,
                                    CompactCosineTen,
                                    CosineMat,
@@ -14,17 +14,17 @@ def explore_similarity_overlapping(modules,
     for module_1_id in range(len(modules)):
         
         module_1 = modules[module_1_id]        
-        modules, current_silhouette, lonely_module = similarity_overlaps_finder(module_1_id = module_1_id,
-                                                                                modules = modules,
-                                                                                current_silhouette = current_silhouette,
-                                                                                IntramoduleSimilarity = IntramoduleSimilarity,
-                                                                                CompactCosineTen = CompactCosineTen,
-                                                                                CosineMat = CosineMat,
-                                                                                cos_tol = cos_tol)           
+        modules, silhouette_vector, lonely_module = similarity_overlaps_finder(module_1_id = module_1_id,
+                                                                               modules = modules,
+                                                                               silhouette_vector = silhouette_vector,
+                                                                               IntramoduleSimilarity = IntramoduleSimilarity,
+                                                                               CompactCosineTen = CompactCosineTen,
+                                                                               CosineMat = CosineMat,
+                                                                               cos_tol = cos_tol)           
         
         if lonely_module:
             modules_explored_count += 1
         else:
             break 
             
-    return [modules, current_silhouette, modules_explored_count]
+    return [modules, silhouette_vector, modules_explored_count]

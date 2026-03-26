@@ -2,7 +2,7 @@ from __future__ import annotations
 from AdjacencyList_from_matrix import *
 from AlignFragmentsEngine import *
 from CosineMatrix import *
-import numpy as np
+from all_modules_silhouette_vector_summarizer import *
 from silhouette_overlap_merging import *
 from silhouette_overlapping import *
 
@@ -24,13 +24,17 @@ def CosClusteringEngine(All_FeaturesTable,
     AdjacencyList_Features, features_ids = AdjacencyList_from_matrix(CosineMat = CosineMat,
                                                                      N_ms2_spectra = N_features,
                                                                      cos_tol = 0.95)
-    modules, current_silhouette = silhouette_overlapping(AdjacencyList_Features = AdjacencyList_Features,
-                                                         CosineMat = CosineMat)
-    modules, IntramoduleSimilarity, CompactCosineTen = silhouette_overlap_merging(modules = modules,
-                                                                                  current_silhouette = current_silhouette,
-                                                                                  CosineMat = CosineMat.copy(),
-                                                                                  percentile = percentile,
-                                                                                  cos_tol = cos_tol)  
+    modules, silhouette_vector = silhouette_overlapping(AdjacencyList_Features = AdjacencyList_Features,
+                                                        CosineMat = CosineMat)
+    modules, silhouette_vector, CompactCosineTen, IntramoduleSimilarity = silhouette_overlap_merging(modules = modules,    
+                                                                                                     silhouette_vector = silhouette_vector,
+                                                                                                     CosineMat = CosineMat.copy(),
+                                                                                                     percentile = percentile,
+                                                                                                    cos_tol = cos_tol)  
+
+    modules_silhouette_summary_table = all_modules_silhouette_vector_summarizer(CosineMat = CosineMat,
+                                                                                modules = modules,
+                                                                                percentile = percentile)
 
     Modules = [list(module) for module in modules]
     This_Module_FeaturesTable = np.hstack((All_FeaturesTable[Feature_module, :].copy(),
@@ -42,6 +46,7 @@ def CosClusteringEngine(All_FeaturesTable,
                             IntramoduleSimilarity,
                             This_Module_FeaturesTable,
                             AlignedFragmentsMat,
-                            AlignedFragments_mz_Mat]  
+                            AlignedFragments_mz_Mat,
+                            modules_silhouette_summary_table]  
                             
     return feature_cluster_data
