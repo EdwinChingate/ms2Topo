@@ -1,11 +1,7 @@
-# --- EvaluateRemainingAnalyticalSamples.py ---
 from __future__ import annotations
-import numpy as np
-from FeaturesTableSamples2Check import *
-from FillAlignedFragmentsSamplesSpectraMat import *
-from FeatureClusterCentroids import *
 from ContrastSamplesCentroids import *
-from MatchSampleSpectra_with_Centroid import *
+from FeatureClusterCentroids import *
+from FillAlignedFragmentsSamplesSpectraMat import *
 from Retrieve_and_Join_ms2_for_feature import *
 from SamplingSamplesSpectra import *
 
@@ -16,6 +12,7 @@ def EvaluateRemainingAnalyticalSamples(Samples_FeaturesIdsList,
                                        SamplesNames,
                                        BigFeature_Module,
                                        IntramoduleSimilarityModulesMat,
+                                       modules_silhouette_summary_table,
                                        sample_id_col = 16,
                                        ms2_spec_id_col = 15,
                                        ms2Folder = 'ms2_spectra',
@@ -25,7 +22,7 @@ def EvaluateRemainingAnalyticalSamples(Samples_FeaturesIdsList,
                                        std_distance = 3,
                                        ppm_tol = 20):
 
-    Modules, Feature_Module, IntramoduleSimilarity, _, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data
+    Modules, Feature_Module, IntramoduleSimilarity, _, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data
     N_modules = len(Modules)
 
     ConfirmedModulesPerSample = {sample_id: set() for sample_id in Samples_ids2Check}
@@ -51,15 +48,14 @@ def EvaluateRemainingAnalyticalSamples(Samples_FeaturesIdsList,
                 RemainingSpectraPerSample[sample_id].remove(true_spectrum_id)
 
         # 3. Try to load them from disk
-        All_ms2, Spectra_idVec = Retrieve_and_Join_ms2_for_feature(
-                                     All_FeaturesTable = All_FeaturesTable,
-                                     Feature_module = SamplesSamplesList_requested,
-                                     SamplesNames = SamplesNames,
-                                     sample_id_col = sample_id_col,
-                                     ms2_spec_id_col = ms2_spec_id_col,
-                                     ms2Folder = ms2Folder,
-                                     ToAdd = ToAdd,
-                                     Norm2One = Norm2One)
+        All_ms2, Spectra_idVec = Retrieve_and_Join_ms2_for_feature(All_FeaturesTable = All_FeaturesTable,
+                                                                   Feature_module = SamplesSamplesList_requested,
+                                                                   SamplesNames = SamplesNames,
+                                                                   sample_id_col = sample_id_col,
+                                                                   ms2_spec_id_col = ms2_spec_id_col,
+                                                                   ms2Folder = ms2Folder,
+                                                                   ToAdd = ToAdd,
+                                                                   Norm2One = Norm2One)
 
         # 4. Only process centroids if we actually loaded some spectra
         if len(All_ms2) > 0:
@@ -75,10 +71,9 @@ def EvaluateRemainingAnalyticalSamples(Samples_FeaturesIdsList,
                     std_distance = std_distance,
                     ppm_tol = ppm_tol)
 
-            CosineToCentroids = ContrastSamplesCentroids(
-                                    AlignedFragmentsSamplesSpectraMat = AlignedFragmentsSamplesSpectraMat,
-                                    CentroidsAlignedFragmentsMat = CentroidsAlignedFragmentsMat,
-                                    N_modules = N_modules)
+            CosineToCentroids = ContrastSamplesCentroids(AlignedFragmentsSamplesSpectraMat = AlignedFragmentsSamplesSpectraMat,
+                                                         CentroidsAlignedFragmentsMat = CentroidsAlignedFragmentsMat,
+                                                         N_modules = N_modules)
 
             # Match logic
             for spectrum_idx, true_spectrum_id in enumerate(SamplesSamplesList_successful):
@@ -115,6 +110,7 @@ def EvaluateRemainingAnalyticalSamples(Samples_FeaturesIdsList,
                             IntramoduleSimilarityModulesMat,
                             All_FeaturesTable,
                             AlignedFragmentsMat,
-                            AlignedFragments_mz_Mat] 
+                            AlignedFragments_mz_Mat,
+                            modules_silhouette_summary_table] 
     
     return feature_cluster_data

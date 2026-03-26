@@ -3,7 +3,7 @@ from modules_merging_evaluation import *
 
 def similarity_overlaps_finder(module_1_id,
                                modules,
-                               current_silhouette,
+                               silhouette_vector,
                                IntramoduleSimilarity,
                                CompactCosineTen,
                                CosineMat,
@@ -22,13 +22,13 @@ def similarity_overlaps_finder(module_1_id,
         two_modules_similarity = CompactCosineTen[module_1_id, module_2_id, 2]
         
         if two_modules_similarity > LowIntramoduleSimmilarity:
-            modules, current_silhouette, merged = modules_merging_evaluation(module_1_id = module_1_id,
-                                                                             module_2_id = module_2_id,
-                                                                             modules = modules,
-                                                                             CosineMat = CosineMat,
-                                                                             current_silhouette = current_silhouette)                      
+            modules, silhouette_vector, merged = modules_merging_evaluation(module_1_id = module_1_id,
+                                                                            module_2_id = module_2_id,
+                                                                            modules = modules,
+                                                                            CosineMat = CosineMat,
+                                                                            silhouette_vector = silhouette_vector)                      
             if merged:
                 lonely_module = False  
                 break
 
-    return [modules, current_silhouette, lonely_module] 
+    return [modules, silhouette_vector, lonely_module] 

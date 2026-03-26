@@ -1,12 +1,11 @@
 from __future__ import annotations
 from CompressCosineMatrix import *
 from IntramoduleSimilarityCalc import *
-from ShowDF import *
 from explore_similarity_overlapping import *
 
 def silhouette_overlap_merging(CosineMat,
                                modules,
-                               current_silhouette,
+                               silhouette_vector,
                                percentile,
                                cos_tol):
     
@@ -20,20 +19,20 @@ def silhouette_overlap_merging(CosineMat,
                                             CosineMat = CosineMat.copy(),
                                             percentile = percentile)
     
-    modules, current_silhouette, modules_explored_count = explore_similarity_overlapping(modules = modules,
-                                                                                         current_silhouette = current_silhouette,
-                                                                                         IntramoduleSimilarity = IntramoduleSimilarity,
-                                                                                         CompactCosineTen = CompactCosineTen,
-                                                                                         CosineMat = CosineMat,
-                                                                                         cos_tol = cos_tol)
+    modules, silhouette_vector, modules_explored_count = explore_similarity_overlapping(modules = modules,
+                                                                                        silhouette_vector = silhouette_vector,
+                                                                                        IntramoduleSimilarity = IntramoduleSimilarity,
+                                                                                        CompactCosineTen = CompactCosineTen,
+                                                                                        CosineMat = CosineMat,
+                                                                                        cos_tol = cos_tol)
     
     if modules_explored_count == n_modules:
-        return [modules, IntramoduleSimilarity, CompactCosineTen]
+        return [modules, silhouette_vector, CompactCosineTen, IntramoduleSimilarity]
         
-    modules, IntramoduleSimilarity, CompactCosineTen = silhouette_overlap_merging(CosineMat = CosineMat,
-                                                                                  current_silhouette = current_silhouette,
-                                                                                  modules = modules,
-                                                                                  percentile = percentile,
-                                                                                  cos_tol = cos_tol) 
+    modules, silhouette_vector, CompactCosineTen, IntramoduleSimilarity = silhouette_overlap_merging(CosineMat = CosineMat,
+                                                                                                     silhouette_vector = silhouette_vector,
+                                                                                                     modules = modules,
+                                                                                                     percentile = percentile,
+                                                                                                     cos_tol = cos_tol) 
     
-    return [modules, IntramoduleSimilarity, CompactCosineTen]
+    return [modules, silhouette_vector, CompactCosineTen, IntramoduleSimilarity]

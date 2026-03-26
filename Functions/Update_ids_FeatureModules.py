@@ -15,10 +15,10 @@ def Update_ids_FeatureModules(AlignedSamplesList,
     if len(feature_cluster_data) == 0:
         return [feature_id, AlignedSamplesList]
     
-    Modules, Feature_module, IntramoduleSimilarity, All_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data
+    Modules, Feature_module, IntramoduleSimilarity, All_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data
     module_id = 0
     for module in Modules:    
-        IntramoduleCosineStatsVec = IntramoduleSimilarity[module_id, 1: 6]
+        IntramoduleCosineStatsVec = modules_silhouette_summary_table[module_id, 1: 6]
         feature_id, AlignedSamplesList = ClosingModule(module = module,
                                                        min_spectra = min_spectra,
                                                        sampling_samples = sampling_samples,

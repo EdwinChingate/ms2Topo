@@ -1,3 +1,4 @@
+from __future__ import annotations
 import numpy as np
 def FeatureModuleStats(All_FeaturesTable,
                        module,
@@ -7,6 +8,7 @@ def FeatureModuleStats(All_FeaturesTable,
                        sampling_samples = 0,
                        percentile_mz = 5,
                        percentile_RT = 5):
+    
     FeatureTable = All_FeaturesTable[module, :]
     N_samples = len(SamplesNames)
     AlignedSamplesVec = np.zeros((N_samples + 18))

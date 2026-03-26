@@ -23,10 +23,10 @@ def SummarizeSampling(feature_clusterList,
                       ToAdd = 'mzML',
                       Norm2One = False):
 
-    All_consensus_ms2, ModulesList, IntramoduleSimilarityList, BigFeature_Module = ReOrganizeSamplingResults(feature_clusterList = feature_clusterList,
-                                                                                                             min_spectra = min_spectra,
-                                                                                                             percentile_mz = percentile_mz,
-                                                                                                             percentile_Int = percentile_Int)
+    All_consensus_ms2, ModulesList, IntramoduleSimilarityList, BigFeature_Module, modules_silhouette_summary_tables_list = ReOrganizeSamplingResults(feature_clusterList = feature_clusterList,
+                                                                                                                                                     min_spectra = min_spectra,
+                                                                                                                                                     percentile_mz = percentile_mz,
+                                                                                                                                                     percentile_Int = percentile_Int)
 
     if len(ModulesList) == 0:
         return []      
@@ -35,6 +35,7 @@ def SummarizeSampling(feature_clusterList,
                                                                             ModulesList = ModulesList,
                                                                             IntramoduleSimilarityList = IntramoduleSimilarityList,
                                                                             BigFeature_Module = BigFeature_Module,
+                                                                            modules_silhouette_summary_tables_list = modules_silhouette_summary_tables_list,
                                                                             All_FeaturesTable = All_FeaturesTable,
                                                                             SamplesNames = SamplesNames,
                                                                             min_spectra = min_spectra,
@@ -52,7 +53,7 @@ def SummarizeSampling(feature_clusterList,
                                              Explained_fractionInt = Explained_fractionInt,
                                              slice_id = slice_id)
     
-    Modules, BigFeature_Module, IntramoduleSimilarityModulesMat, _, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data 
+    Modules, BigFeature_Module, IntramoduleSimilarityModulesMat, _, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data 
     N_modules = len(Modules) 
 
     Samples_FeaturesIdsList, Samples_ids2Check = FeaturesTableSamples2Check(Feature_Module = BigFeature_Module,
@@ -70,6 +71,7 @@ def SummarizeSampling(feature_clusterList,
                                                               SamplesNames = SamplesNames,
                                                               BigFeature_Module = BigFeature_Module,
                                                               IntramoduleSimilarityModulesMat = IntramoduleSimilarityModulesMat,
+                                                              modules_silhouette_summary_table = modules_silhouette_summary_table,
                                                               sample_id_col = sample_id_col,
                                                               ms2_spec_id_col = ms2_spec_id_col,
                                                               ms2Folder = ms2Folder,

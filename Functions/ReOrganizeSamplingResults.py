@@ -1,7 +1,6 @@
 from __future__ import annotations
 from ConsensusSpectra import *
 import numpy as np
-import pandas as pd
 
 def ReOrganizeSamplingResults(feature_clusterList,
                               min_spectra = 3,
@@ -13,12 +12,13 @@ def ReOrganizeSamplingResults(feature_clusterList,
     IntramoduleSimilarityList = []
     feature_id = 0
     BigFeature_Module = []
+    modules_silhouette_summary_tables_list = []
     
     for feature_cluster_data in feature_clusterList:
         
         if len(feature_cluster_data) == 0:           
             continue
-        Modules, Feature_Module, IntramoduleSimilarity, This_Module_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat = feature_cluster_data        
+        Modules, Feature_Module, IntramoduleSimilarity, This_Module_FeaturesTable, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data        
    
         for module_id in np.arange(len(Modules)):   
             module = Modules[module_id]            
@@ -40,6 +40,7 @@ def ReOrganizeSamplingResults(feature_clusterList,
                                                   ignore_index = True)            
                 ModulesList.append(np.array(Feature_Module)[module].tolist()) 
                 IntramoduleSimilarityList.append(IntramoduleSimilarity[module_id, :])
+                modules_silhouette_summary_tables_list.append(modules_silhouette_summary_table)
                 BigFeature_Module += np.array(Feature_Module)[module].tolist()
                 feature_id += 1  
 
@@ -47,4 +48,4 @@ def ReOrganizeSamplingResults(feature_clusterList,
         return [pd.DataFrame(), [], [], []]
     BigFeature_Module = list(set(BigFeature_Module))
     
-    return [All_consensus_ms2, ModulesList, IntramoduleSimilarityList, BigFeature_Module]
+    return [All_consensus_ms2, ModulesList, IntramoduleSimilarityList, BigFeature_Module, modules_silhouette_summary_tables_list]
