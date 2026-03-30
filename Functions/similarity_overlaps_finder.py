@@ -31,4 +31,4 @@ def similarity_overlaps_finder(module_1_id,
                 lonely_module = False  
                 break
 
-    return [modules, silhouette_vector, lonely_module] 
+    return [modules, silhouette_vector, lonely_module]

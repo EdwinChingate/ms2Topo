@@ -9,10 +9,12 @@ def separation_vector_calculator(CosineMat,
                                                                            modules = modules)    
     
     separation_vector = np.zeros(n_nodes)
+    closest_module_vector = np.zeros(n_nodes)
     
     for node_id in range(n_nodes):
         closest_module2node_id = int(np.argmax(nodes_modules_cosine_matrix[node_id, :]))
+        closest_module_vector[node_id] = closest_module2node_id
         module = modules[closest_module2node_id]
         separation_vector[node_id] = np.mean(CosineMat[node_id, list(module)])
         
-    return separation_vector
+    return [separation_vector, closest_module_vector]

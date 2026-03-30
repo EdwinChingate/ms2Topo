@@ -7,8 +7,8 @@ def all_modules_silhouette_vector_summarizer(CosineMat,
                                              modules,
                                              percentile = 10):
     
-    silhouette_vector = silhouette_vector_calculator(CosineMat = CosineMat,
-                                                     modules = modules) 
+    silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = CosineMat,
+                                                                            modules = modules) 
     
     modules_silhouette_summary_table = []
     for module in modules:

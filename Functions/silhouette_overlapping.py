@@ -6,7 +6,7 @@ def silhouette_overlapping(AdjacencyList_Features,
                            CosineMat):
     
     merged_modules = merge_full_overlapping(modules = AdjacencyList_Features)
-    modules, silhouette_vector = silhouette_merging(CosineMat = CosineMat,
-                                                     modules = merged_modules)
+    modules, silhouette_vector, closest_module_vector = silhouette_merging(CosineMat = CosineMat,
+                                                                           modules = merged_modules)
     
-    return [modules, silhouette_vector]
+    return [modules, silhouette_vector, closest_module_vector]

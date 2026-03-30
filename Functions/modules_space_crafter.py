@@ -1,5 +1,6 @@
 from __future__ import annotations
 import numpy as np
+
 def modules_space_crafter(module_1_id,
                           overlapping_vector,
                           modules):

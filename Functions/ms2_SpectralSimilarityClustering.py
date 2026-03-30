@@ -3,6 +3,7 @@ from AdjacencyListFeatures import *
 from ms2_FeaturesDifferences import *
 from ms2_feat_modules import *
 import numpy as np
+import pandas as pd
 
 def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                      SampleName = '',
@@ -35,9 +36,11 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                   ms2_ids = feat_ids)
     AlignedSamplesList = []
     N_raw_modules = len(RawModules)
-    
+    print(N_raw_modules)
     for feature_module_id in np.arange(N_raw_modules):
-        Feature_module = RawModules[feature_module_id]        
+        Feature_module = RawModules[feature_module_id]   
+       # print(len(Feature_module))
+       # print(np.min(SummMS2_raw[Feature_module, 1]), np.max(SummMS2_raw[Feature_module, 1]))
         feature_id, AlignedSamplesList = ms2_FeaturesDifferences(All_FeaturesTable = SummMS2_raw,
                                                                  Feature_module = Feature_module,
                                                                  AlignedSamplesList = AlignedSamplesList,
@@ -50,6 +53,7 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                                                  Norm2One = Norm2One,
                                                                  feature_id = feature_id,
                                                                  slice_id = slice_id)
+       # ShowDF(AlignedSamplesList)
         
     feature_descriptor_columns = ['median_mz(Da)',
                                   'min_mz',
@@ -76,45 +80,3 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
     return_columns = np.array(feature_descriptor_columns)[[0, 3, 13, 12, 14, 5, 6, 4, 8, 9, 10, 7, 11, 1, 2, 15, 16, 17]].tolist() + SamplesNames 
     
     return [AlignedSamplesDF[np.array(return_columns)], feature_id]
-
-
-#from ms2_SamplesAligment import *
-
-def ms2_SamplesAligment(ProjectName,
-                        All_SummMS2Table,
-                        EdgesMat,
-                        SamplesNames,
-                        RT_tol = 30,
-                        mz_Tol = 2e-3,
-                        feature_id = 0,
-                        cos_tol = 0.8,
-                        min_N_ms2_spectra = 3,
-                        ToReplace = 'mzML-ms2Summary.xlsx',
-                        ms2Folder = 'ms2_spectra',
-                        ToAdd = 'mzML',
-                        Norm2One = True):
-                        
-    for Low_id_mz, High_id_mz, slice_id in EdgesMat:
-        SummMS2_raw = All_SummMS2Table[Low_id_mz: High_id_mz, :]
-        AlignedSamplesDF, feature_id = ms2_SpectralSimilarityClustering(SummMS2_raw = SummMS2_raw,
-                                                                        SamplesNames = SamplesNames,
-                                                                        feature_id = feature_id,
-                                                                        slice_id = slice_id,
-                                                                        mz_col = 1,
-                                                                        RT_col = 2,
-                                                                        RT_tol = RT_tol,
-                                                                        mz_Tol = mz_Tol,
-                                                                        sample_id_col = 6,
-                                                                        ms2_spec_id_col = 0,
-                                                                        ms2Folder = ms2Folder,
-                                                                        ToAdd = ToAdd,
-                                                                        cos_tol = cos_tol,
-                                                                        Norm2One = Norm2One)     
-        TableLoc = ProjectName + '-' + str(slice_id) + '.csv'
-        #AlignedSamplesDF.to_csv(TableLoc)
-    return AlignedSamplesDF        
-    
-    
-                                                            
-
-                
