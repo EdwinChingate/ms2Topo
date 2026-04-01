@@ -19,10 +19,11 @@ def silhouette_vector_calculator(CosineMat,
     else:
         separation_vector = np.zeros(n_nodes)
         closest_module_vector = np.zeros(n_nodes).astype(int)
-        
     silhouette_vector = np.zeros(n_nodes)
     
     for node_id in range(n_nodes):
-        silhouette_vector[node_id] = (cohesion_vector[node_id] - separation_vector[node_id]) / (1 - min([cohesion_vector[node_id], separation_vector[node_id]]))
-      
+        if cohesion_vector[node_id] > 0:
+            silhouette_vector[node_id] = (cohesion_vector[node_id] - separation_vector[node_id]) / (1 - min([cohesion_vector[node_id], separation_vector[node_id]]))
+        else:
+            silhouette_vector[node_id] = 0
     return [silhouette_vector, closest_module_vector]

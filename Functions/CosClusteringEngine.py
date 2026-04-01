@@ -3,10 +3,16 @@ from AdjacencyList_from_matrix import *
 from AlignFragmentsEngine import *
 from CosineMatrix import *
 from IntramoduleSimilarityCalc import *
+from ShowDF import *
 from all_modules_silhouette_vector_summarizer import *
+from genetic_silhouette_clustering import *
+from modules_vector2modules_list import *
 import numpy as np
 from silhouette_merging_neighbor_clusters import *
 from silhouette_overlapping import *
+from silhouette_vector_calculator import *
+
+# TODO: unresolved names: module
 
 def CosClusteringEngine(All_FeaturesTable,
                         All_ms2,
@@ -27,13 +33,32 @@ def CosClusteringEngine(All_FeaturesTable,
     #ShowDF(CosineMat)
     #print("CosClusteringEngine")
     #ShowDF(All_FeaturesTable)
+    
+    
+    
+    
     AdjacencyList_Features, features_ids = AdjacencyList_from_matrix(CosineMat = CosineMat,
                                                                      N_ms2_spectra = N_features,
                                                                      cos_tol = cos_tol)
     modules, silhouette_vector, closest_module_vector = silhouette_overlapping(AdjacencyList_Features = AdjacencyList_Features,
                                                                                CosineMat = CosineMat)
-    #print("silhouette_vector")
+
+    
+    modules_vector = modules_vector2modules_list(modules = modules,
+                                                 silhouette_vector = silhouette_vector)
+    population = [modules_vector]
+    #print("silhouette_vector")    
     #print(silhouette_vector)
+    #
+    #modules = np.array([{node_id} for node_id in np.arange(len(CosineMat))])
+    #
+    #silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = CosineMat,
+    #                                                                        modules = modules)     
+    
+    
+    print("silhouette_vector")    
+    print(silhouette_vector)
+    print(closest_module_vector)
     #print('just spectral overlapping')
     #print(modules)
     print("before merging")
@@ -62,6 +87,26 @@ def CosClusteringEngine(All_FeaturesTable,
     #print("silhouette_vector")
     print("after merging")    
     print(np.mean(silhouette_vector))
+    print("silhouette_vector")    
+    print(silhouette_vector) 
+    
+    modules_vector = modules_vector2modules_list(modules = modules,
+                                                 silhouette_vector = silhouette_vector)
+    population.append(modules_vector)
+    
+    ShowDF(np.array(population))
+    
+    modules = genetic_silhouette_clustering(CosineMat = CosineMat,
+                                            population = population,
+                                            n_individuals2keep = 10,
+                                            stable_iterations = 5)
+    silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = CosineMat,
+                                                                            modules = modules)     
+    
+    print("genetic")    
+    print(np.mean(silhouette_vector))
+    print("silhouette_vector")    
+    print(silhouette_vector) 
     #print('more overlapping')
     #for module in modules:
     #    print(module)
