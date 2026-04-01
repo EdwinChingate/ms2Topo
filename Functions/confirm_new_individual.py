@@ -9,8 +9,8 @@ def confirm_new_individual(population_matrix,
     contrast_vector_eval = np.where(contrast_vector == 0)[0]
     
     if len(contrast_vector_eval) > 0:
-        return [population_matrix, False]
+        return [population_matrix, True]
     
     population_matrix = np.vstack((population_matrix, individual))
     
-    return [population_matrix, True]
+    return [population_matrix, False]

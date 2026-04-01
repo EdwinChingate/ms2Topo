@@ -9,8 +9,6 @@ def silhouette_merging_neighbor_clusters(modules,
                                          closest_module_vector):
         
     silhouette = np.mean(silhouette_vector)
-    #print(modules)
-    #print(silhouette)
     silhouette_neighborhood_matrix = silhouette_neighborhood_matrix_crafter(modules = modules,
                                                                             CosineMat = CosineMat,
                                                                             closest_module_vector = closest_module_vector)    

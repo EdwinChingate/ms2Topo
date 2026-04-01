@@ -3,7 +3,6 @@ from AdjacencyList_from_matrix import *
 from AlignFragmentsEngine import *
 from CosineMatrix import *
 from IntramoduleSimilarityCalc import *
-from ShowDF import *
 from all_modules_silhouette_vector_summarizer import *
 from genetic_silhouette_clustering import *
 from modules_vector2modules_list import *
@@ -56,9 +55,9 @@ def CosClusteringEngine(All_FeaturesTable,
     #                                                                        modules = modules)     
     
     
-    print("silhouette_vector")    
-    print(silhouette_vector)
-    print(closest_module_vector)
+    #print("silhouette_vector")    
+    #print(silhouette_vector)
+    #print(closest_module_vector)
     #print('just spectral overlapping')
     #print(modules)
     print("before merging")
@@ -87,26 +86,28 @@ def CosClusteringEngine(All_FeaturesTable,
     #print("silhouette_vector")
     print("after merging")    
     print(np.mean(silhouette_vector))
-    print("silhouette_vector")    
-    print(silhouette_vector) 
+    #print("silhouette_vector")    
+    #print(silhouette_vector) 
     
     modules_vector = modules_vector2modules_list(modules = modules,
                                                  silhouette_vector = silhouette_vector)
     population.append(modules_vector)
+    population.append(np.arange(len(modules_vector)))
+    population.append(np.ones(len(modules_vector)))
     
-    ShowDF(np.array(population))
     
     modules = genetic_silhouette_clustering(CosineMat = CosineMat,
+                                            population_matrix = np.array(population),
                                             population = population,
-                                            n_individuals2keep = 10,
+                                            n_individuals2keep = 5,
                                             stable_iterations = 5)
     silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = CosineMat,
                                                                             modules = modules)     
     
     print("genetic")    
     print(np.mean(silhouette_vector))
-    print("silhouette_vector")    
-    print(silhouette_vector) 
+    #print("silhouette_vector")    
+    #print(silhouette_vector) 
     #print('more overlapping')
     #for module in modules:
     #    print(module)

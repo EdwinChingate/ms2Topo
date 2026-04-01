@@ -40,7 +40,7 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
     for feature_module_id in np.arange(N_raw_modules):
         Feature_module = RawModules[feature_module_id]   
        # print(len(Feature_module))
-       # print(np.min(SummMS2_raw[Feature_module, 1]), np.max(SummMS2_raw[Feature_module, 1]))
+        print(np.min(SummMS2_raw[Feature_module, 1]), np.max(SummMS2_raw[Feature_module, 1]))
         feature_id, AlignedSamplesList = ms2_FeaturesDifferences(All_FeaturesTable = SummMS2_raw,
                                                                  Feature_module = Feature_module,
                                                                  AlignedSamplesList = AlignedSamplesList,
