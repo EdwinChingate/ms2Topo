@@ -10,7 +10,6 @@ def find_and_reassign_negative_silhouette_nodes(modules_vector,
     silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = CosineMat,
                                                                             modules = modules)    
     node2reassign = np.argmin(silhouette_vector)
-    
     if silhouette_vector[node2reassign] >= 0:
         return modules
     

@@ -12,7 +12,7 @@ def nodes_modules_cosine_similarity(CosineMat,
         for module_id in range(n_modules):
             module = modules[module_id]
             if int(node_id) in module:
-                nodes_modules_cosine_matrix[node_id, module_id] = 0
+                nodes_modules_cosine_matrix[node_id, module_id] = -1
             else:
                 nodes_modules_cosine_matrix[node_id, module_id] = np.mean(CosineMat[node_id, list(module)])
     
