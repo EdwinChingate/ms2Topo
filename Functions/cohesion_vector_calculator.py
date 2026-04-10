@@ -13,6 +13,6 @@ def cohesion_vector_calculator(CosineMat,
             if len(module) > 1:
                 cohesion_vector[node_id] = (np.sum(CosineMat[node_id, list(module)]) - 1) / (len(module) - 1)
             else:
-                cohesion_vector[node_id] = 0
+                cohesion_vector[node_id] = 1
             
     return cohesion_vector        

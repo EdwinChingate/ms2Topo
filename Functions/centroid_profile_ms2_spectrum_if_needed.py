@@ -1,7 +1,6 @@
 from __future__ import annotations
 from detect_spectral_signal_mode import *
-
-# TODO: unresolved names: oms
+import pyopenms as oms
 
 def centroid_profile_ms2_spectrum_if_needed(spectral_signals):
     spectral_signal_mode = detect_spectral_signal_mode(spectral_signals = spectral_signals)
