@@ -32,11 +32,16 @@ def CosineOverlappingClustering(Feature_module,
     Feature_module = np.array(Feature_module)[Spectra_idVec].tolist()
     feature_cluster_data = CosClusteringEngine(All_FeaturesTable = All_FeaturesTable,
                                                All_ms2 = All_ms2,
+                                               SamplesNames = SamplesNames,
                                                Feature_module = Feature_module,
+                                               sample_id_col = sample_id_col,
+                                               ms2_spec_id_col = ms2_spec_id_col,
                                                slice_id = slice_id,
                                                Intensity_to_explain = Intensity_to_explain,
                                                min_spectra = min_spectra,
                                                cos_tol = cos_tol,
-                                               percentile = percentile)
-    
+                                               percentile = percentile,
+                                               Norm2One = Norm2One,
+                                               ms2Folder = ms2Folder)
+
     return feature_cluster_data

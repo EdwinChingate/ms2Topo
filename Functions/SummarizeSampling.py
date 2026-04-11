@@ -30,7 +30,7 @@ def SummarizeSampling(feature_clusterList,
 
     if len(ModulesList) == 0:
         return []      
-    
+
     feature_cluster_data, Explained_fractionInt = ClusteringSamplingModules(All_consensus_ms2 = All_consensus_ms2,
                                                                             ModulesList = ModulesList,
                                                                             IntramoduleSimilarityList = IntramoduleSimilarityList,
@@ -48,11 +48,11 @@ def SummarizeSampling(feature_clusterList,
                                                                             ms2Folder = ms2Folder,
                                                                             ToAdd = ToAdd,
                                                                             Norm2One = Norm2One)
-    
+
     feature_cluster_data = FormattingSummary(feature_cluster_data = feature_cluster_data,
                                              Explained_fractionInt = Explained_fractionInt,
                                              slice_id = slice_id)
-    
+
     Modules, BigFeature_Module, IntramoduleSimilarityModulesMat, _, AlignedFragmentsMat, AlignedFragments_mz_Mat, modules_silhouette_summary_table = feature_cluster_data 
     N_modules = len(Modules) 
 
@@ -80,5 +80,5 @@ def SummarizeSampling(feature_clusterList,
                                                               Nspectra_sampling = Nspectra_sampling,
                                                               std_distance = 3,     
                                                               ppm_tol = 20)
-                                                              
+
     return feature_cluster_data

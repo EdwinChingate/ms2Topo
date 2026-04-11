@@ -1,10 +1,11 @@
 from __future__ import annotations
+from AdjacencyList_from_matrix import *
 from AlignFragmentsEngine import *
 from CosineMatrix import *
 from Retrieve_and_Join_ms2_for_feature import *
 import numpy as np
 from piling_up_consensus_ms2_spectra import *
-from scipy_seeds_finder import *
+from silhouette_overlapping import *
 
 def centroid_modules_extraction(sample_feature_module,
                                 all_features_table,
@@ -48,11 +49,29 @@ def centroid_modules_extraction(sample_feature_module,
 
     cosine_matrix = CosineMatrix(AlignedFragmentsMat = aligned_fragments_mat,
                                  N_features = n_features)
+    #ShowDF(cosine_matrix)
+    #modules = scipy_seeds_finder(cosine_matrix = cosine_matrix,
+    #                             seed_cosine_tolerance = seed_cosine_tolerance,
+    #                             min_nodes = min_spectra)
 
-    modules = scipy_seeds_finder(cosine_matrix = cosine_matrix,
-                                 seed_cosine_tolerance = seed_cosine_tolerance,
-                                 min_nodes = min_nodes)
+    #modules, silhouette_vector_leiden = leiden_silhouette_clustering(CosineMat = cosine_matrix,
+    #                                                                 extract_mst = False)
+    #print(modules)
 
+    AdjacencyList_Features, features_ids = AdjacencyList_from_matrix(CosineMat = cosine_matrix,
+                                                                     N_ms2_spectra = n_features,
+                                                                     cos_tol = 0.95)
+    modules, silhouette_vector_overlapping, closest_module_vector = silhouette_overlapping(AdjacencyList_Features = AdjacencyList_Features,
+                                                                                           CosineMat = cosine_matrix)
+
+    filtered_modules = []
+
+    for module in modules:
+        if len(module) > min_spectra:
+            filtered_modules.append(module)
+
+    modules = np.array(filtered_modules)
+    print(modules)
     piling_state = piling_up_consensus_ms2_spectra(feature_id = feature_id,
                                                    modules = modules,
                                                    aligned_fragments_mat = aligned_fragments_mat,

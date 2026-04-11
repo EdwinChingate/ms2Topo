@@ -1,32 +1,44 @@
 from __future__ import annotations
-from best_merging4silhouette import *
-from find_and_reassign_negative_silhouette_nodes import *
-from merging_combinations_mudules_space import *
+from leiden_clustering_space_engine import *
 import numpy as np
-from igraph import Graph
-import leidenalg as la
 
-def leiden_silhouette_clustering(CosineMat):
-    
+# TODO: unresolved names: Graph
+
+def leiden_silhouette_clustering(CosineMat,
+                                 extract_mst = True,
+                                 resolution_parameter = 0.4,
+                                 n_iterations = 3):
+
     cosine_matrix = CosineMat.copy()
     np.fill_diagonal(cosine_matrix, 0) 
 
     similarity_cosine_network = Graph.Weighted_Adjacency(cosine_matrix,
-                                                         mode="undirected",
-                                                         attr="weight",
-                                                         loops=False)
-    partition = la.find_partition(similarity_cosine_network,
-                                  la.ModularityVertexPartition,
-                                  weights = "weight")
+                                                         mode = "undirected",
+                                                         attr = "weight",
+                                                         loops = False)
+    if extract_mst:
+        i_network = similarity_cosine_network.spanning_tree(weights = - np.array(similarity_cosine_network.es["weight"]),
+                                                            return_tree = True)
 
-    modules = find_and_reassign_negative_silhouette_nodes(modules_vector = np.array(partition.membership),
-                                                          CosineMat = CosineMat)
-    
-    modules_space = merging_combinations_mudules_space(modules = modules,
-                                                       modules_space = [modules])
-    
-    
-    modules, silhouette_vector, closest_module_vector = best_merging4silhouette(CosineMat = CosineMat,
-                                                                                modules_space = modules_space)
+    else:
+        i_network = similarity_cosine_network
+
+    #fig, ax = plt.subplots()
+    #ig.plot(
+    #i_network,
+    #target=ax,
+    #vertex_size = 7,
+    #edge_width = 1,
+    #vertex_color="lightblue",
+    #edge_background="white",
+    #)
+    #plt.show()
+    modules, silhouette_vector = leiden_clustering_space_engine(CosineMat = CosineMat,
+                                                                i_network = i_network,
+                                                                resolution_parameter = resolution_parameter,
+                                                                n_iterations = n_iterations)
 
     return [modules, silhouette_vector]
+
+
+# In[107]:

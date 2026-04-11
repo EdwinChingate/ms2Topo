@@ -58,11 +58,12 @@ def infer_modules_centroids(all_features_table,
 
         centroids_cosine_tolerance = max(centroids_cosine_tolerance,
                                          extraction_state['max_centroids_cosine_similarity'])
+    centroids_cosine_tolerance = (centroids_cosine_tolerance + seed_cosine_tolerance) / 2
 
     centroid_state = cluster_ms2_centroids(all_consensus_ms2 = all_consensus_ms2,
                                            centroids_cosine_tolerance = centroids_cosine_tolerance,
                                            intensity_to_explain = 1,
-                                           min_spectra = 1,
-                                           min_nodes = 1)
+                                           min_spectra = min_spectra,
+                                           min_nodes = min_nodes)
 
     return centroid_state

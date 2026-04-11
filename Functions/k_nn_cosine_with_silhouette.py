@@ -38,6 +38,24 @@ def k_nn_cosine_with_silhouette(raw_feature_module,
                                              seed_cosine_tolerance = seed_cosine_tolerance,
                                              min_nodes = min_nodes)
 
+    required_keys = ['consensus_aligned_fragments_mz_mat',
+                     'consensus_aligned_fragments_mat',
+                     'consensus_labels',
+                     'centroid_modules']
+
+    if len(centroid_state) == 0:
+        return [[],
+                centroid_state]
+
+    for key in required_keys:
+        if key not in centroid_state:
+            return [[],
+                    centroid_state]
+
+    if len(centroid_state['centroid_modules']) == 0:
+        return [[],
+                centroid_state]
+
     modules = k_nn_cosine_similarity_space(raw_feature_module = raw_feature_module,
                                            all_features_table = all_features_table,
                                            SamplesNames = SamplesNames,

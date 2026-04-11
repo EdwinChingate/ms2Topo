@@ -2,8 +2,8 @@ from __future__ import annotations
 from AlignFragmentsEngine import *
 from CosineMatrix import *
 from consensus_df_to_pseudo_all_ms2 import *
+from leiden_silhouette_clustering import *
 import numpy as np
-from scipy_seeds_finder import *
 
 def cluster_ms2_centroids(all_consensus_ms2,
                           centroids_cosine_tolerance,
@@ -26,10 +26,17 @@ def cluster_ms2_centroids(all_consensus_ms2,
 
     cosine_matrix = CosineMatrix(AlignedFragmentsMat = aligned_fragments_mat,
                                  N_features = n_features)
+    #ShowDF(cosine_matrix)
+    #centroid_modules = scipy_seeds_finder(cosine_matrix = cosine_matrix,
+    #                                      seed_cosine_tolerance = centroids_cosine_tolerance,
+    #                                      min_nodes = min_nodes)
 
-    centroid_modules = scipy_seeds_finder(cosine_matrix = cosine_matrix,
-                                          seed_cosine_tolerance = centroids_cosine_tolerance,
-                                          min_nodes = min_nodes)
+    centroid_modules, silhouette_vector_leiden = leiden_silhouette_clustering(CosineMat = cosine_matrix,
+                                                                              extract_mst = False)
+
+    #print(centroid_modules)
+    #print('net')
+    #print(centroids_cosine_tolerance)
 
     n_fragments = aligned_fragments_mat.shape[0]
     centroid_vectors = []
@@ -63,6 +70,7 @@ def cluster_ms2_centroids(all_consensus_ms2,
         centroids_matrix = np.column_stack([aligned_fragments_mat[:, 0]] + centroid_vectors)
         centroids_mz_matrix = np.column_stack([aligned_fragments_mz_mat[:, 0]] + centroid_mz_vectors)
 
+    #ShowDF(centroids_matrix)
     return {'all_consensus_ms2': all_consensus_ms2,
             'pseudo_all_ms2': pseudo_all_ms2,
             'consensus_aligned_fragments_mat': aligned_fragments_mat,

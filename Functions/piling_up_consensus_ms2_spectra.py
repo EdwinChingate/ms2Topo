@@ -83,12 +83,10 @@ def piling_up_consensus_ms2_spectra(feature_id,
                          0)
         max_centroids_cosine_similarity = np.max(centroid_cosine_matrix)
 
-    return {
-        'all_consensus_ms2': all_consensus_ms2,
-        'max_centroids_cosine_similarity': max_centroids_cosine_similarity,
-        'first_spectra': first_spectra,
-        'feature_id': feature_id,
-        'centroids_fragments_mat': centroids_fragments_mat,
-        'centroids_fragments_mz_mat': centroids_fragments_mz_mat,
-        'consensus_spectra_list': consensus_spectra_list
-    }
+    return {'all_consensus_ms2': all_consensus_ms2,
+            'max_centroids_cosine_similarity': max_centroids_cosine_similarity,
+            'first_spectra': first_spectra,
+            'feature_id': feature_id,
+            'centroids_fragments_mat': centroids_fragments_mat,
+            'centroids_fragments_mz_mat': centroids_fragments_mz_mat,
+            'consensus_spectra_list': consensus_spectra_list}

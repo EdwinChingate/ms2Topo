@@ -22,16 +22,16 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                      Norm2One = False,
                                      max_Nspectra_cluster = 250,
                                      Nspectra_sampling = 100):
-    
+
     if len(SamplesNames) == 0:
         SamplesNames = [SampleName]
-        
+
     AdjacencyList, feat_ids = AdjacencyListFeatures(MS2_features = SummMS2_raw,
                                                     mz_col = mz_col,
                                                     RT_col = RT_col,
                                                     RT_tol = RT_tol,
                                                     mz_Tol = mz_Tol)
-    
+
     RawModules = ms2_feat_modules(AdjacencyList = AdjacencyList,
                                   ms2_ids = feat_ids)
     AlignedSamplesList = []
@@ -54,7 +54,7 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                                                  feature_id = feature_id,
                                                                  slice_id = slice_id)
        # ShowDF(AlignedSamplesList)
-        
+
     feature_descriptor_columns = ['median_mz(Da)',
                                   'min_mz',
                                   'max_mz',
@@ -73,10 +73,10 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                   'min_RT(s)',
                                   'max_RT(s)',
                                   'feat_id']
-    
+
     all_columns = feature_descriptor_columns + SamplesNames 
     AlignedSamplesDF = pd.DataFrame(AlignedSamplesList,
                                     columns = all_columns)
     return_columns = np.array(feature_descriptor_columns)[[0, 3, 13, 12, 14, 5, 6, 4, 8, 9, 10, 7, 11, 1, 2, 15, 16, 17]].tolist() + SamplesNames 
-    
+
     return [AlignedSamplesDF[np.array(return_columns)], feature_id]
