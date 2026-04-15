@@ -20,6 +20,28 @@ def infer_modules_centroids(all_features_table,
                             seed_cosine_tolerance = 0.9,
                             min_nodes = 3):
 
+    ###############3
+
+
+
+
+    global raw_feature_module_g
+    global all_features_table_g    
+
+    raw_feature_module_g = raw_feature_module
+    all_features_table_g = all_features_table
+
+
+
+
+
+
+
+
+    ##############
+
+
+
     all_consensus_ms2 = None
     first_spectra = True
     feature_id = 0
@@ -34,7 +56,7 @@ def infer_modules_centroids(all_features_table,
                                            size = current_sampling_size,
                                            replace = False)
 
-        extraction_state = centroid_modules_extraction(sample_feature_module = sample_feature_module,
+        extraction_state = centroid_modules_extraction(sample_feature_module = np.array(sample_feature_module).astype(int),
                                                        all_features_table = all_features_table,
                                                        SamplesNames = SamplesNames,
                                                        feature_id = feature_id,
@@ -67,3 +89,12 @@ def infer_modules_centroids(all_features_table,
                                            min_nodes = min_nodes)
 
     return centroid_state
+
+
+# In[ ]:
+
+
+
+
+
+# In[9]:
