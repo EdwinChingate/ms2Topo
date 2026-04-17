@@ -20,3 +20,8 @@ def consensus_df_to_pseudo_all_ms2(consensus_spectra_df,
     pseudo_all_ms2[:, 10] = consensus_spectra_df[spectrum_id_col].astype(int).to_numpy()
 
     return pseudo_all_ms2
+
+
+
+
+# In[5]:

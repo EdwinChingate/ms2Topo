@@ -24,3 +24,6 @@ def cosine_to_training_space(aligned_query_mat,
             cosine_to_training[query_id, train_id] = Cosine_2VecSpec(AlignedSpecMat = aligned_spec_mat)
 
     return cosine_to_training
+
+
+# In[241]:

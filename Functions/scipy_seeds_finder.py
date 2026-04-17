@@ -25,4 +25,4 @@ def scipy_seeds_finder(cosine_matrix,
                                   labels = labels,
                                   min_nodes = min_nodes)
 
-    return modules
+    return np.array(modules)

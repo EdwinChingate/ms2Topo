@@ -32,8 +32,7 @@ def CosClusteringEngine(All_FeaturesTable,
 
     global silhouetteList
 
-    AlignedFragmentsMat, AlignedFragments_mz_Mat, Explained_fractionInt, N_features = AlignFragmentsEngine(All_ms2 = All_ms2,
-                                                                                                           Feature_module = Feature_module,
+    AlignedFragmentsMat, AlignedFragments_mz_Mat, Explained_fractionInt, N_features = AlignFragmentsEngine(all_ms2 = All_ms2,
                                                                                                            Intensity_to_explain = Intensity_to_explain,
                                                                                                            min_spectra = min_spectra)
     CosineMat = CosineMatrix(AlignedFragmentsMat = AlignedFragmentsMat,
@@ -44,13 +43,11 @@ def CosClusteringEngine(All_FeaturesTable,
 
     global test_feature_module
     global all_features_table
-    global SamplesNames_g
     global Norm2One_g
     global ms2Folder_g
     global sample_id_col_g
     global ms2_spec_id_col_g
 
-    SamplesNames_g = SamplesNames
     Norm2One_g = Norm2One
     ms2Folder_g = ms2Folder
     sample_id_col_g = sample_id_col
@@ -165,16 +162,4 @@ def CosClusteringEngine(All_FeaturesTable,
     return feature_cluster_data
 
 
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[24]:
+# In[20]:

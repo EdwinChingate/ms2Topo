@@ -42,8 +42,7 @@ def centroid_modules_extraction(sample_feature_module,
                 'first_spectra': first_spectra,
                 'feature_id': feature_id}
 
-    sample_feature_module = np.array(sample_feature_module)[spectra_id_vec]
-    print(sample_feature_module)
+    sample_feature_module = np.array(sample_feature_module)[spectra_id_vec].astype(int)
     n_spectra = len(sample_feature_module)
 
     if use_pseudo_all_ms2:
@@ -74,14 +73,7 @@ def centroid_modules_extraction(sample_feature_module,
     #modules, silhouette_vector_overlapping, closest_module_vector = silhouette_overlapping(AdjacencyList_Features = AdjacencyList_Features,
     #                                                                                       CosineMat = cosine_matrix)
 
-    filtered_modules = []
 
-    for module in modules:
-        if len(module) > min_spectra:
-            filtered_modules.append(module)
-
-    modules = np.array(filtered_modules)
-    print(modules)
     piling_state = piling_up_consensus_ms2_spectra(feature_id = feature_id,
                                                    modules = modules,
                                                    aligned_fragments_mat = aligned_fragments_mat,
@@ -102,4 +94,4 @@ def centroid_modules_extraction(sample_feature_module,
     return piling_state
 
 
-# In[31]:
+# In[9]:

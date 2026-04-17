@@ -1,23 +1,23 @@
 from __future__ import annotations
 import numpy as np
 
-# TODO: unresolved names: centroid_seed
+# TODO: unresolved names: centroid_seed, module
 
 def balance_centroid(modules,
-                     module,
+                     aligned_fragments_mat,
+                     new_modules,
                      n_spectra):
 
-    n_nodes = len(module)
+    all_nodes_counter = np.array([np.max(list(module)) for module in new_modules])
+    n_nodes = len(aligned_fragments_mat[0, :]) - 1
+    nodes_weights = np.ones(n_nodes)  
 
-    nodes_weights = np.ones(n_nodes)    
-    centroid_seeds = np.where(module >= n_spectra)[0] 
-
-    if len(centroid_seeds) == 0:
+    if n_nodes == n_spectra:
         return nodes_weights
 
-    nodes_weights[centroid_seeds] = np.array([len(modules[centroid_seed - n_spectra])
-                                                          for centroid_seed in centroid_seeds])
+    nodes_weights[n_spectra: ] = np.array([len(modules[centroid_seed])
+                                           for centroid_seed in range(n_nodes - n_spectra)])
     return nodes_weights
 
 
-# In[47]:
+# In[10]:

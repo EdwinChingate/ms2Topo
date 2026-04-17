@@ -7,7 +7,7 @@ def modules_from_labels(n_modules,
     modules = []
 
     for module_id in range(n_modules):
-        module = set(np.where(labels == module_id)[0].tolist())
+        module = set(np.where(labels == module_id)[0].astype(int).tolist())
         if len(module) >= min_nodes:
             modules.append(module)
 
