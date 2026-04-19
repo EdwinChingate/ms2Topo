@@ -19,6 +19,7 @@ def Update_ids_FeatureModules(AlignedSamplesList,
     module_id = 0
     for module in Modules:    
         IntramoduleCosineStatsVec = modules_silhouette_summary_table[module_id, 1: 6]
+        #IntramoduleCosineStatsVec = IntramoduleSimilarity[module_id, 1: 6]
         feature_id, AlignedSamplesList = ClosingModule(module = module,
                                                        min_spectra = min_spectra,
                                                        sampling_samples = sampling_samples,

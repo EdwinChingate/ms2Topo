@@ -1,5 +1,6 @@
 from __future__ import annotations
-from silhouette_vector_calculator import *
+from binary_modules_merging import *
+import numpy as np
 
 def modules_merging_evaluation(module_1_id,
                                module_2_id,
@@ -8,15 +9,12 @@ def modules_merging_evaluation(module_1_id,
                                silhouette_vector):
     
     silhouette = np.mean(silhouette_vector)
-    module_1 = modules[module_1_id]
-    modules_ids_set = set(np.arange(len(modules)).tolist())
-    non_overlap_loc = list(modules_ids_set - set([module_1_id, module_2_id]))
-    module_2 = modules[module_2_id]
-    the_other_modules = modules[non_overlap_loc].copy().tolist()   
-    new_modules = np.array(the_other_modules + [module_1 | module_2])
     
-    new_silhouette_vector = silhouette_vector_calculator(CosineMat = CosineMat,
-                                                         modules = new_modules)  
+    new_modules, new_silhouette_vector, closest_module_vector = binary_modules_merging(module_1_id = module_1_id,
+                                                                                       module_2_id = module_2_id,
+                                                                                       CosineMat = CosineMat,
+                                                                                       modules = modules)
+    
     new_silhouette = np.mean(new_silhouette_vector)
 
     if new_silhouette > silhouette:

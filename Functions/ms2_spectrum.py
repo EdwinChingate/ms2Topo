@@ -1,35 +1,31 @@
+from __future__ import annotations
+from centroid_profile_ms2_spectrum_if_needed import *
+from compute_relative_fragment_intensity_percent import *
+from extract_fragment_peak_table import *
 import numpy as np
-from ms2_peakStats_safe import *
-def ms2_spectrum(RawSpectrum,DataSetName,ms_id,LogFileName,mz_std=2e-3,stdDistance=3,minQuality=100,minInt=1e2,minSignals=4,MaxCount=3,Points_for_regression=4,minPeaks=2,sort=2,as_des=-1): 
-    RawSpectrum=RawSpectrum[RawSpectrum[:,1]>0,:]
-    TotalInt=sum(RawSpectrum[:,1])
-    if len(RawSpectrum[:,0])<minSignals:
-        return []    
-    Spectrum=[]
-    while True:
-        maxInt=np.max(RawSpectrum[:,1])    
-        if maxInt<minInt:
-            break
-        maxIntLoc=RawSpectrum[:,1]==maxInt
-        mz_maxInt=RawSpectrum[maxIntLoc,0][0]
-        peak_stats=ms2_peakStats_safe(RawSpectrum=RawSpectrum,DataSetName=DataSetName,ms_id=ms_id,mz=mz_maxInt,LogFileName=LogFileName,TotalInt=TotalInt,mz_std=mz_std,stdDistance=stdDistance,minSignals=minSignals,MaxCount=MaxCount,minInt=minInt,Points_for_regression=Points_for_regression)
-        if len(peak_stats)>0:        
-            min_mz_peak=peak_stats[7]
-            max_mz_peak=peak_stats[8]
-            Spectrum.append(peak_stats)      
-        else:
-            min_mz_peak=mz_maxInt-mz_std*stdDistance
-            max_mz_peak=mz_maxInt+mz_std*stdDistance
-        Latest_peakFilter=(RawSpectrum[:,0]<min_mz_peak)|(RawSpectrum[:,0]>max_mz_peak)       
-        RawSpectrum=RawSpectrum[Latest_peakFilter,:]                  
-        if len(RawSpectrum[:,0])<minSignals:
-            break    
-    if len(Spectrum)<minPeaks:
+from remove_nonpositive_fragment_peaks import *
+from sort_fragment_peak_table_by_intensity import *
+
+def ms2_spectrum(spectral_signals,
+                 min_peaks = 1):
+    if spectral_signals.getMSLevel() != 2:
         return []
-    Spectrum=np.array(Spectrum)    
-    Spectrum=Spectrum[(as_des*Spectrum[:,sort]).argsort(),:]
-    RelIntVec=(Spectrum[:,2]/Spectrum[0,2]*100).reshape(-1, 1) 
-    Spectrum=np.hstack((Spectrum,RelIntVec))
-    QualityFilter=Spectrum[:,6]<minQuality
-    Spectrum=Spectrum[QualityFilter,:]
-    return Spectrum
+
+    centroided_ms2_spectrum = centroid_profile_ms2_spectrum_if_needed(spectral_signals = spectral_signals)
+
+    fragment_peak_table = extract_fragment_peak_table(spectral_signals = centroided_ms2_spectrum)
+
+    fragment_peak_table = remove_nonpositive_fragment_peaks(fragment_peak_table = fragment_peak_table)
+
+    if len(fragment_peak_table) < min_peaks:
+        return []
+
+    fragment_peak_table = sort_fragment_peak_table_by_intensity(fragment_peak_table = fragment_peak_table,
+                                                                descending = True)
+
+    relative_fragment_intensity_percent = compute_relative_fragment_intensity_percent(fragment_peak_table = fragment_peak_table)
+
+    formatted_fragment_peak_table = np.hstack((fragment_peak_table,
+                                               relative_fragment_intensity_percent))
+
+    return formatted_fragment_peak_table

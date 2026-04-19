@@ -22,7 +22,7 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                             Nspectra_sampling = 54,
                             max_Nspectra_cluster = 250,
                             feature_id = 0):    
-    
+
     feature_cluster_data, sampling_samples = FeatureClusterData(All_FeaturesTable = All_FeaturesTable,
                                                                 Feature_module = Feature_module,
                                                                 Intensity_to_explain = Intensity_to_explain,
@@ -41,7 +41,7 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                                                                 Norm2One = Norm2One,
                                                                 percentile_mz = percentile_mz,
                                                                 percentile_Int = percentile_Int)
-    
+
     feature_id, AlignedSamplesList = Update_ids_FeatureModules(feature_cluster_data = feature_cluster_data,
                                                                AlignedSamplesList = AlignedSamplesList,
                                                                sample_id_col = sample_id_col,
@@ -52,5 +52,5 @@ def ms2_FeaturesDifferences(All_FeaturesTable,
                                                                min_spectra = min_spectra,
                                                                sampling_samples = sampling_samples,
                                                                SamplesNames = SamplesNames)
-                                                               
+
     return [feature_id, AlignedSamplesList]

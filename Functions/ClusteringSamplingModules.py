@@ -4,8 +4,8 @@ from CosineOverlappingClustering import *
 from Retrieve_and_Join_ms2_for_feature import *
 from UpdateIntramoduleSimilarityAfterClustering import *
 from UpdateUniqueModulesAfterClustering import *
+import numpy as np
 from update_silhouette_summary_table_after_clustering import *
-
 
 def ClusteringSamplingModules(All_consensus_ms2,      
                               ModulesList,            
@@ -24,7 +24,7 @@ def ClusteringSamplingModules(All_consensus_ms2,
                               ms2Folder = 'ms2_spectra',
                               ToAdd = 'mzML',
                               Norm2One = False):
-                    
+
     feature_cluster_data = CosineOverlappingClustering(All_ms2 = np.array(All_consensus_ms2),
                                                        SamplesNames = SamplesNames,
                                                        All_FeaturesTable = All_FeaturesTable,
@@ -40,7 +40,7 @@ def ClusteringSamplingModules(All_consensus_ms2,
 
     IntramoduleSimilarityModulesMat = UpdateIntramoduleSimilarityAfterClustering(Modules = Modules,
                                                                                  IntramoduleSimilarityList = IntramoduleSimilarityList)
-   
+
     sampling_modules_silhouette_summary_table = update_silhouette_summary_table_after_clustering(modules = Modules,
                                                                                                  modules_silhouette_summary_tables_list = modules_silhouette_summary_tables_list)
 
@@ -68,5 +68,5 @@ def ClusteringSamplingModules(All_consensus_ms2,
                             AlignedFragmentsMat,
                             AlignedFragments_mz_Mat,
                             sampling_modules_silhouette_summary_table]
-                            
+
     return [feature_cluster_data, Explained_fractionInt]

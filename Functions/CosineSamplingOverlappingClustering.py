@@ -26,12 +26,13 @@ def CosineSamplingOverlappingClustering(Feature_module,
     sampling = 0
     max_attempts = SamplingTimes * 5 
     attempts = 0
-    
+
     while sampling < SamplingTimes and attempts < max_attempts:
         attempts += 1
         rng = np.random.default_rng()
         Sample_Feature_module = rng.choice(Feature_module,
-                                           size = Nspectra_sampling)
+                                           size = Nspectra_sampling,
+                                           replace = False)
         feature_cluster_data = CosineOverlappingClustering(All_FeaturesTable = All_FeaturesTable,
                                                            Feature_module = Sample_Feature_module,
                                                            sample_id_col = sample_id_col,
@@ -51,7 +52,7 @@ def CosineSamplingOverlappingClustering(Feature_module,
 
     if len(feature_clusterList) == 0:
         return []
-            
+
     feature_cluster_data = SummarizeSampling(feature_clusterList = feature_clusterList,
                                              All_FeaturesTable = All_FeaturesTable.copy(),
                                              Original_Feature_module = Feature_module,
@@ -68,5 +69,5 @@ def CosineSamplingOverlappingClustering(Feature_module,
                                              ms2Folder = ms2Folder,
                                              ToAdd = ToAdd,
                                              Norm2One = Norm2One)    
-                                             
+
     return feature_cluster_data
