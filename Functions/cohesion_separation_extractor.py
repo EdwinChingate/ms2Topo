@@ -28,6 +28,3 @@ def cohesion_separation_extractor(n_nodes,
         closest_module_vector = np.zeros(n_nodes).astype(int)
 
     return [cohesion_vector, separation_vector, closest_module_vector]
-
-
-# In[246]:

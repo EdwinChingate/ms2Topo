@@ -38,6 +38,3 @@ def greedy_growth_from_mixed_modules(new_modules,
 
     return [np.array(updated_modules, dtype = object),
             assigned_spectra]
-
-
-# In[14]:

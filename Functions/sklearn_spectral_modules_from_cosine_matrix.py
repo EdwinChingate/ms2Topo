@@ -40,6 +40,3 @@ def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
 
     return np.array(modules,
                     dtype = object)
-
-
-# In[172]:

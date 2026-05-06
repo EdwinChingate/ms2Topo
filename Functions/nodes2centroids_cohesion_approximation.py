@@ -12,6 +12,3 @@ def nodes2centroids_cohesion_approximation(nodes_modules_cosine_matrix):
         nodes_modules_cosine_matrix[spectrum_local_id, best_module_id] = -1
 
     return [cohesion_vector, nodes_modules_cosine_matrix]
-
-
-# In[244]:

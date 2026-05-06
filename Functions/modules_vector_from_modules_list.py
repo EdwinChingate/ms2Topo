@@ -11,6 +11,3 @@ def modules_vector_from_modules_list(modules,
         modules_vector[list(module)] = module_id
         module_id += 1
     return modules_vector
-
-
-# In[6]:

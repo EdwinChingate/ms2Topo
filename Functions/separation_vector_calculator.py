@@ -23,6 +23,3 @@ def separation_vector_calculator(CosineMat,
         separation_vector[node_id] = np.mean(CosineMat[node_id, list(module)])
 
     return [separation_vector, closest_module_vector]
-
-
-# In[242]:

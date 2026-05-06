@@ -4,14 +4,12 @@ import numpy as np
 
 def silhouette_vector_calculator(modules,
                                  CosineMat = None,
-                                 nodes_modules_cosine_matrix = None,
-                                 aproximate_mean_with_centroid = True):
+                                 aproximate_mean_with_centroid = False):
 
     n_nodes = len(CosineMat)
     cohesion_vector, separation_vector, closest_module_vector = cohesion_separation_extractor(n_nodes = n_nodes,
                                                                                               CosineMat = CosineMat,
                                                                                               modules = modules,
-                                                                                              nodes_modules_cosine_matrix = nodes_modules_cosine_matrix,
                                                                                               aproximate_mean_with_centroid = aproximate_mean_with_centroid)
 
     silhouette_vector = np.zeros(n_nodes)
@@ -23,6 +21,3 @@ def silhouette_vector_calculator(modules,
             silhouette_vector[node_id] = 0
 
     return [silhouette_vector, closest_module_vector]
-
-
-# In[272]:

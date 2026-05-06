@@ -92,6 +92,3 @@ def centroid_modules_extraction(sample_feature_module,
     piling_state['cosine_matrix'] = cosine_matrix
 
     return piling_state
-
-
-# In[9]:
