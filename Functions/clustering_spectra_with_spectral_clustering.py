@@ -1,25 +1,26 @@
 from __future__ import annotations
 from CosineMatrix import *
 from IntramoduleSimilarityCalc import *
+from ShowDF import *
 from align_fragments_engine import *
 from all_modules_silhouette_vector_summarizer import *
 from estimate_k_by_resampled_spectral_clustering import *
 import numpy as np
 from sklearn_spectral_modules_from_cosine_matrix import *
 
-# TODO: unresolved names: AlignedFragmentsMat, AlignedFragments_mz_Mat, Explained_fractionInt, Spectra_idVec, module, silhouette_evaluation_matrix
+# TODO: unresolved names: module
 
 def clustering_spectra_with_spectral_clustering(Feature_module,
                                                 All_FeaturesTable,
                                                 SamplesNames,
                                                 Intensity_to_explain = 0.9,
-                                                min_spectra = 3,
+                                                min_spectra_fraction = 0.3,
                                                 cos_tol = 0.9,
                                                 percentile = 10,
                                                 percentile_mz = 5,
                                                 percentile_Int = 10,
                                                 slice_id = 0,
-                                                max_Nspectra_cluster = 170,
+                                                max_Nspectra_cluster = 8,
                                                 Nspectra_sampling = 54,
                                                 SamplingTimes = 20,
                                                 sample_id_col = 16,
@@ -27,39 +28,59 @@ def clustering_spectra_with_spectral_clustering(Feature_module,
                                                 ms2Folder = 'ms2_spectra',
                                                 ToAdd = 'mzML',
                                                 Norm2One = False):
-    all_features_table = All_FeaturesTable
-    raw_feature_module = Feature_module
+    """
+    Orchestrate MS2 spectral clustering for one raw feature module.
 
+    Flow:
+        1. Retrieve and align MS2 spectra.
+        2. Estimate k with resampled spectral clustering.
+        3. Run the final spectral partition on the full aligned-fragment matrix.
+        4. Build feature_cluster_data in the downstream ms2Topo format.
+    """
+    n_spectra = len(Feature_module)
+    min_spectra = min_spectra_fraction * n_spectra
+    aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features, Spectra_idVec = align_fragments_engine(All_FeaturesTable = All_FeaturesTable,
+                                                                                                                                 Feature_module = Feature_module,
+                                                                                                                                 SamplesNames = SamplesNames,
+                                                                                                                                 sample_id_col = sample_id_col,
+                                                                                                                                 ms2_spec_id_col = ms2_spec_id_col,
+                                                                                                                                 ms2Folder = ms2Folder,
+                                                                                                                                 ToAdd = ToAdd,
+                                                                                                                                 Norm2One = Norm2One,
+                                                                                                                                 Intensity_to_explain = Intensity_to_explain,
+                                                                                                                                 min_spectra = min_spectra)
+    print(aligned_fragments_mat.shape)
+    filtered_feature_module = np.array(Feature_module)[Spectra_idVec].tolist()
 
-    aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features = align_fragments_engine()
-    n_fragments = len(aligned_fragments_mat[:, 0])
-    raw_feature_module = np.array(raw_feature_module)[Spectra_idVec].tolist()
-    n_spectra = len(Spectra_idVec)
+    n_spectra = aligned_fragments_mat.shape[1] - 1
 
+    current_sampling_size = min(Nspectra_sampling,
+                                n_spectra)
 
+    max_n_clusters = min(max_Nspectra_cluster,
+                         current_sampling_size)
 
-
-    n_clusters = estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat)
-
-
+    n_clusters, silhouette_evaluation_matrix, all_modules_by_iteration, sampled_spectra_by_iteration = estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat = aligned_fragments_mat,
+                                                                                                                                                   max_n_clusters = max_n_clusters,
+                                                                                                                                                   n_iterations = SamplingTimes,
+                                                                                                                                                   current_sampling_size = current_sampling_size,
+                                                                                                                                                   min_nodes = 1,
+                                                                                                                                                   assign_labels = 'discretize',
+                                                                                                                                                   random_state = 0)
+    ShowDF(silhouette_evaluation_matrix)
 
     cosine_matrix = CosineMatrix(AlignedFragmentsMat = aligned_fragments_mat,
-                                 N_features = len(aligned_fragments_mat[0, :] - 1))
-    modules = sklearn_spectral_modules_from_cosine_matrix(cosine_matrix = cosine_matrix,
-                                                          n_clusters = n_clusters,
-                                                          min_nodes = 1,
-                                                          assign_labels = 'discretize',
-                                                          random_state = 0)            
+                                 N_features = n_spectra)
 
-
-    n_clusters = np.argmax(np.mean(silhouette_evaluation_matrix, axis = 0))
-    cosine_matrix = CosineMatrix(AlignedFragmentsMat = aligned_fragments_mat,
-                                 N_features = len(aligned_fragments_mat[0, :] - 1))
-    modules = sklearn_spectral_modules_from_cosine_matrix(cosine_matrix = cosine_matrix,
-                                                          n_clusters = n_clusters,
-                                                          min_nodes = 1,
-                                                          assign_labels = 'discretize',
-                                                          random_state = 0)                
+    if n_clusters == 1:
+        modules = np.array([set(range(n_spectra))],
+                           dtype = object)
+    else:
+        modules = sklearn_spectral_modules_from_cosine_matrix(cosine_matrix = cosine_matrix,
+                                                              n_clusters = n_clusters,
+                                                              min_nodes = 1,
+                                                              assign_labels = 'discretize',
+                                                              random_state = 0)
 
     IntramoduleSimilarity = IntramoduleSimilarityCalc(Modules = modules,
                                                       CosineMat = cosine_matrix.copy(),
@@ -70,16 +91,22 @@ def clustering_spectra_with_spectral_clustering(Feature_module,
                                                                                 percentile = percentile)
 
     Modules = [list(module) for module in modules]
-    This_Module_FeaturesTable = np.hstack((All_FeaturesTable[Feature_module, :].copy(),
-                                           Explained_fractionInt))
+
+    This_Module_FeaturesTable = np.hstack((All_FeaturesTable[filtered_feature_module, :].copy(),
+                                           explained_fraction_int.reshape(-1, 1)))
+
     This_Module_FeaturesTable = np.hstack((This_Module_FeaturesTable,
-                                           slice_id * np.ones(len(Explained_fractionInt)).reshape(-1, 1)))
+                                           slice_id * np.ones(len(explained_fraction_int)).reshape(-1, 1)))
+
     feature_cluster_data = [Modules,
-                            Feature_module,
+                            filtered_feature_module,
                             IntramoduleSimilarity,
                             This_Module_FeaturesTable,
-                            AlignedFragmentsMat,
-                            AlignedFragments_mz_Mat,
+                            aligned_fragments_mat,
+                            aligned_fragments_mz_mat,
                             modules_silhouette_summary_table]
 
-    return [feature_cluster_data, 1]
+    sampling_samples = current_sampling_size
+
+    return [feature_cluster_data,
+            sampling_samples]

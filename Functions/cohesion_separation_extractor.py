@@ -9,12 +9,17 @@ def cohesion_separation_extractor(n_nodes,
                                   CosineMat = None,
                                   nodes_modules_cosine_matrix = None,
                                   aproximate_mean_with_centroid = False):
+    """
+    Extract cohesion, separation, and closest-module vectors for a partition.
+    """
 
     if n_nodes == 1:
         cohesion_vector = np.array([1])
+
     elif aproximate_mean_with_centroid:
         cohesion_vector, nodes_modules_cosine_matrix = nodes2centroids_cohesion_approximation(nodes_modules_cosine_matrix = nodes_modules_cosine_matrix)
-    else:    
+
+    else:
         cohesion_vector = cohesion_vector_calculator(CosineMat = CosineMat,
                                                      modules = modules)
 

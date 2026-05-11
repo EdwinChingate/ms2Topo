@@ -1,24 +1,37 @@
 from __future__ import annotations
 from AlignFragmentsEngine import *
 from Retrieve_and_Join_ms2_for_feature import *
-from retrieve_ms2_for_clustering import *
 
-# TODO: unresolved names: SamplesNames, all_features_table, ms2Folder, ms2_spec_id_col_g, raw_feature_module, sample_id_col_g
+def align_fragments_engine(All_FeaturesTable,
+                           Feature_module,
+                           SamplesNames,
+                           sample_id_col,
+                           ms2_spec_id_col,
+                           ms2Folder = 'ms2_spectra',
+                           ToAdd = 'mzML',
+                           Norm2One = False,
+                           Intensity_to_explain = 0.9,
+                           min_spectra = 3):
+    """
+    Retrieve MS2 spectra for a raw feature module and align their fragments.
+    """
 
-def align_fragments_engine():
-
-    retrieve_ms2_for_clustering()
-    all_ms2, Spectra_idVec = Retrieve_and_Join_ms2_for_feature(All_FeaturesTable = all_features_table,
-                                                               Feature_module = raw_feature_module,
+    all_ms2, Spectra_idVec = Retrieve_and_Join_ms2_for_feature(All_FeaturesTable = All_FeaturesTable,
+                                                               Feature_module = Feature_module,
                                                                SamplesNames = SamplesNames,
-                                                               sample_id_col = sample_id_col_g,
-                                                               ms2_spec_id_col = ms2_spec_id_col_g,
+                                                               sample_id_col = sample_id_col,
+                                                               ms2_spec_id_col = ms2_spec_id_col,
                                                                ms2Folder = ms2Folder,
-                                                               ToAdd = 'mzML',
-                                                               Norm2One = True)
-    aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features = AlignFragmentsEngine(all_ms2 = all_ms2,
-                                                                                                                Feature_module = raw_feature_module,
-                                                                                                                Intensity_to_explain = 0.9,
-                                                                                                                min_spectra = 5)
+                                                               ToAdd = ToAdd,
+                                                               Norm2One = Norm2One)
 
-    return [aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features]
+    aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features = AlignFragmentsEngine(all_ms2 = all_ms2,
+                                                                                                                Feature_module = Feature_module,
+                                                                                                                Intensity_to_explain = Intensity_to_explain,
+                                                                                                                min_spectra = min_spectra)
+
+    return [aligned_fragments_mat,
+            aligned_fragments_mz_mat,
+            explained_fraction_int,
+            n_features,
+            Spectra_idVec]
