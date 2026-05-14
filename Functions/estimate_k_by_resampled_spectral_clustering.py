@@ -23,23 +23,14 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
 
     n_spectra = aligned_fragments_mat.shape[1] - 1
 
-    if n_spectra < 1:
-        raise ValueError("aligned_fragments_mat must contain at least one spectrum column after the m/z column.")
+    if n_spectra < current_sampling_size:
+        current_sampling_size = n_spectra
+        n_iterations = 1
 
-    current_sampling_size = min(int(current_sampling_size),
-                                n_spectra)
-
-    current_sampling_size = max(current_sampling_size,
-                                1)
-
-    max_n_clusters = min(int(max_n_clusters),
-                         current_sampling_size)
-
-    max_n_clusters = max(max_n_clusters,
-                         1)
-
-    n_iterations = max(int(n_iterations),
-                       1)
+    max_n_clusters = min(current_sampling_size // 3,
+                         max_n_clusters) #3
+    max_n_clusters =max(max_n_clusters,
+                        1)
 
     rng = np.random.default_rng(random_state)
 

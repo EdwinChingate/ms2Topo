@@ -40,3 +40,6 @@ def retrieve_random_aligned_fragments(aligned_fragments_mat,
     return [cosine_matrix,
             current_sample_aligned_fragments_mat,
             sampled_spectrum_ids]
+
+
+# In[5]:

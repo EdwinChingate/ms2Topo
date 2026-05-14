@@ -20,3 +20,6 @@ def ms2_spectra_centroiding(modules,
         aligned_centroids_mat[:, module_id + 1] = ms2_spectrum[:, 9]
 
     return aligned_centroids_mat
+
+
+# In[10]:
