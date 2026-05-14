@@ -24,6 +24,3 @@ def AlignFragmentsEngine(all_ms2,
                                                                                                      min_spectra = min_spectra)
 
     return [AlignedFragmentsMat, AlignedFragments_mz_Mat, Explained_fractionInt, N_features]
-
-
-# In[7]:

@@ -20,8 +20,17 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                      ToAdd = 'mzML',
                                      cos_tol = 0.9,
                                      Norm2One = False,
-                                     max_Nspectra_cluster = 250,
+                                     min_spectra_fraction = 0.3,
+                                     Intensity_to_explain = 0.9,
+                                     percentile = 10,
+                                     percentile_mz = 5,
+                                     percentile_Int = 10,
+                                     SamplingTimes = 20,
+                                     max_Nspectra_cluster = 8,
                                      Nspectra_sampling = 100):
+    """
+    Cluster all raw feature modules within one m/z slice.
+    """
 
     if len(SamplesNames) == 0:
         SamplesNames = [SampleName]
@@ -34,13 +43,13 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
 
     RawModules = ms2_feat_modules(AdjacencyList = AdjacencyList,
                                   ms2_ids = feat_ids)
+
     AlignedSamplesList = []
     N_raw_modules = len(RawModules)
-    print(N_raw_modules)
+
     for feature_module_id in np.arange(N_raw_modules):
-        Feature_module = RawModules[feature_module_id]   
-       # print(len(Feature_module))
-        print(np.min(SummMS2_raw[Feature_module, 1]), np.max(SummMS2_raw[Feature_module, 1]))
+        Feature_module = RawModules[feature_module_id]
+
         feature_id, AlignedSamplesList = ms2_FeaturesDifferences(All_FeaturesTable = SummMS2_raw,
                                                                  Feature_module = Feature_module,
                                                                  AlignedSamplesList = AlignedSamplesList,
@@ -52,8 +61,15 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                                                  cos_tol = cos_tol,
                                                                  Norm2One = Norm2One,
                                                                  feature_id = feature_id,
-                                                                 slice_id = slice_id)
-       # ShowDF(AlignedSamplesList)
+                                                                 slice_id = slice_id,
+                                                                 min_spectra_fraction = min_spectra_fraction,
+                                                                 Intensity_to_explain = Intensity_to_explain,
+                                                                 percentile = percentile,
+                                                                 percentile_mz = percentile_mz,
+                                                                 percentile_Int = percentile_Int,
+                                                                 SamplingTimes = SamplingTimes,
+                                                                 max_Nspectra_cluster = max_Nspectra_cluster,
+                                                                 Nspectra_sampling = Nspectra_sampling)
 
     feature_descriptor_columns = ['median_mz(Da)',
                                   'min_mz',
@@ -74,9 +90,12 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
                                   'max_RT(s)',
                                   'feat_id']
 
-    all_columns = feature_descriptor_columns + SamplesNames 
+    all_columns = feature_descriptor_columns + SamplesNames
+
     AlignedSamplesDF = pd.DataFrame(AlignedSamplesList,
                                     columns = all_columns)
-    return_columns = np.array(feature_descriptor_columns)[[0, 3, 13, 12, 14, 5, 6, 4, 8, 9, 10, 7, 11, 1, 2, 15, 16, 17]].tolist() + SamplesNames 
 
-    return [AlignedSamplesDF[np.array(return_columns)], feature_id]
+    return_columns = np.array(feature_descriptor_columns)[[0, 3, 13, 12, 14, 5, 6, 8, 9, 10, 7, 11, 1, 2, 15, 16, 17]].tolist() + SamplesNames
+
+    return [AlignedSamplesDF[np.array(return_columns)],
+            feature_id]

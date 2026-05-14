@@ -10,6 +10,29 @@ def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
                                                 random_state = 0,
                                                 clip_negative = True,
                                                 unit_diagonal = True):
+    """
+    Run spectral clustering from a precomputed cosine/affinity matrix and return
+    modules as sets of local node indices.
+    """
+
+    n_nodes = len(cosine_matrix)
+
+    if n_nodes == 0:
+        return np.array([],
+                        dtype = object)
+
+    if n_clusters <= 1:
+        module = set(range(n_nodes))
+
+        if len(module) >= min_nodes:
+            return np.array([module],
+                            dtype = object)
+
+        return np.array([],
+                        dtype = object)
+
+    n_clusters = min(int(n_clusters),
+                     n_nodes)
 
     affinity_matrix = np.array(cosine_matrix,
                                dtype = float).copy()
@@ -40,6 +63,3 @@ def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
 
     return np.array(modules,
                     dtype = object)
-
-
-# In[172]:

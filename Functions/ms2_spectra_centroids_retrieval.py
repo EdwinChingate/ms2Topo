@@ -33,6 +33,3 @@ def ms2_spectra_centroids_retrieval(modules,
                                        axis = 0) 
 
     return [pseudo_all_ms2, aligned_centroids_mat]
-
-
-# In[12]:

@@ -22,6 +22,3 @@ def modules_centroiding(aligned_fragments_mat,
         ms2_spectrum[:, 9] = ms2_spectrum[:, 9] / norm    
 
     return ms2_spectrum
-
-
-# In[11]:

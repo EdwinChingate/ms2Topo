@@ -6,15 +6,20 @@ from silhouette_vector_calculator import *
 def all_modules_silhouette_vector_summarizer(CosineMat,
                                              modules,
                                              percentile = 10):
-    
+    """
+    Summarize silhouette values for every module.
+    """
+
     silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = CosineMat,
-                                                                            modules = modules) 
-    
+                                                                            modules = modules)
+
     modules_silhouette_summary_table = []
+
     for module in modules:
         module_silhouette_summary = module_silhouette_vector_summarizer(silhouette_vector = silhouette_vector,
                                                                         module = module,
                                                                         percentile = percentile)
+
         modules_silhouette_summary_table.append(module_silhouette_summary)
-    
+
     return np.array(modules_silhouette_summary_table)

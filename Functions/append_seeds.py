@@ -17,6 +17,3 @@ def append_seeds(module,
         new_module = new_module | modules[centroid_seed - n_spectra]
 
     return new_module  
-
-
-# In[13]:

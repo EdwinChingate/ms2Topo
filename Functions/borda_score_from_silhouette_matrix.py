@@ -69,5 +69,3 @@ def borda_score_from_silhouette_matrix(silhouette_evaluation_matrix,
     return [borda_matrix,
             borda_summary_df]
 
-
-# In[240]:

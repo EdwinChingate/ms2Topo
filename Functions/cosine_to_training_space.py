@@ -4,6 +4,12 @@ import numpy as np
 
 def cosine_to_training_space(aligned_query_mat,
                              training_mat):
+    """
+    Compute cosine similarity from query spectra to training spectra.
+
+    Both matrices are expected to have fragment m/z in column 0 and spectra in
+    columns 1:.
+    """
 
     n_queries = aligned_query_mat.shape[1] - 1
     n_training = training_mat.shape[1] - 1
@@ -24,6 +30,3 @@ def cosine_to_training_space(aligned_query_mat,
             cosine_to_training[query_id, train_id] = Cosine_2VecSpec(AlignedSpecMat = aligned_spec_mat)
 
     return cosine_to_training
-
-
-# In[241]:

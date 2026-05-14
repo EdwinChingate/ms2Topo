@@ -1,6 +1,8 @@
-import pandas as pd
+from __future__ import annotations
 import numpy as np
 import os
+import pandas as pd
+
 def Retrieve_and_Join_ms2_for_feature(All_FeaturesTable,
                                       Feature_module,
                                       SamplesNames,
@@ -23,9 +25,9 @@ def Retrieve_and_Join_ms2_for_feature(All_FeaturesTable,
             sample_id = 0
         ms2_spec_id = str(int(features_stats[ms2_spec_id_col]))
         sample_name_id = SamplesNames[sample_id] + ToAdd
-        ms2_spectrumLoc = ms2Folder + '/' + sample_name_id + '/' + ms2_spec_id + '.csv'
+        ms2_spectrumLoc = ms2Folder + '/' + sample_name_id + '/' + ms2_spec_id + '.csv'        
         ExistSpectrum = os.path.exists(ms2_spectrumLoc)
-        if ExistSpectrum:            
+        if ExistSpectrum:                        
             ms2_spectrumDF = pd.read_csv(ms2_spectrumLoc, index_col = 0)
             ms2_spectrum = np.array(ms2_spectrumDF)      
             if Norm2One:

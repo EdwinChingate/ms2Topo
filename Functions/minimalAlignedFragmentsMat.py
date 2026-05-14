@@ -1,7 +1,7 @@
-
-
-import numpy as np
+from __future__ import annotations
 from minimalSpectrum import *
+import numpy as np
+
 def minimalAlignedFragmentsMat(AlignedFragmentsMat,
                                AlignedFragments_mz_Mat,
                                Intensity_to_explain = 0.9,
