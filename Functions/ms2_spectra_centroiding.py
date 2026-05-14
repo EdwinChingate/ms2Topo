@@ -12,7 +12,6 @@ def ms2_spectra_centroiding(modules,
     aligned_centroids_mat[:, 0] = aligned_fragments_mat[:, 0]
 
     for module_id, module in enumerate(modules):
-        print(module)
         ms2_spectrum = modules_centroiding(aligned_fragments_mat = aligned_fragments_mat,
                                            nodes_weights = np.ones(n_spectra),
                                            module_id = module_id,

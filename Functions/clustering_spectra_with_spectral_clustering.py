@@ -1,7 +1,6 @@
 from __future__ import annotations
 from CosineMatrix import *
 from IntramoduleSimilarityCalc import *
-from ShowDF import *
 from align_fragments_engine import *
 from all_modules_silhouette_vector_summarizer import *
 from estimate_k_by_resampled_spectral_clustering import *
@@ -13,6 +12,7 @@ from sklearn_spectral_modules_from_cosine_matrix import *
 def clustering_spectra_with_spectral_clustering(Feature_module,
                                                 All_FeaturesTable,
                                                 SamplesNames,
+                                                std_times = 1,
                                                 Intensity_to_explain = 0.9,
                                                 min_spectra_fraction = 0.3,
                                                 cos_tol = 0.9,
@@ -38,17 +38,17 @@ def clustering_spectra_with_spectral_clustering(Feature_module,
         4. Build feature_cluster_data in the downstream ms2Topo format.
     """
     n_spectra = len(Feature_module)
-    min_spectra = min_spectra_fraction * n_spectra
+    min_spectra = int(np.ceil(min_spectra_fraction * n_spectra))
     aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features, Spectra_idVec = align_fragments_engine(All_FeaturesTable = All_FeaturesTable,
-                                                                                                                                 Feature_module = Feature_module,
-                                                                                                                                 SamplesNames = SamplesNames,
-                                                                                                                                 sample_id_col = sample_id_col,
-                                                                                                                                 ms2_spec_id_col = ms2_spec_id_col,
-                                                                                                                                 ms2Folder = ms2Folder,
-                                                                                                                                 ToAdd = ToAdd,
-                                                                                                                                 Norm2One = Norm2One,
-                                                                                                                                 Intensity_to_explain = Intensity_to_explain,
-                                                                                                                                 min_spectra = min_spectra)
+                                                                                                                                Feature_module = Feature_module,
+                                                                                                                                SamplesNames = SamplesNames,
+                                                                                                                                sample_id_col = sample_id_col,
+                                                                                                                                ms2_spec_id_col = ms2_spec_id_col,
+                                                                                                                                ms2Folder = ms2Folder,
+                                                                                                                                ToAdd = ToAdd,
+                                                                                                                                Norm2One = Norm2One,
+                                                                                                                                Intensity_to_explain = Intensity_to_explain,
+                                                                                                                                min_spectra = min_spectra)
     print(aligned_fragments_mat.shape)
     filtered_feature_module = np.array(Feature_module)[Spectra_idVec].tolist()
 
@@ -60,14 +60,14 @@ def clustering_spectra_with_spectral_clustering(Feature_module,
     max_n_clusters = min(max_Nspectra_cluster,
                          current_sampling_size)
 
-    n_clusters, silhouette_evaluation_matrix, all_modules_by_iteration, sampled_spectra_by_iteration = estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat = aligned_fragments_mat,
-                                                                                                                                                   max_n_clusters = max_n_clusters,
-                                                                                                                                                   n_iterations = SamplingTimes,
-                                                                                                                                                   current_sampling_size = current_sampling_size,
-                                                                                                                                                   min_nodes = 1,
-                                                                                                                                                   assign_labels = 'discretize',
-                                                                                                                                                   random_state = 0)
-    ShowDF(silhouette_evaluation_matrix)
+    n_clusters, all_modules_by_iteration, sampled_spectra_by_iteration = estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat = aligned_fragments_mat,
+                                                                                                                     max_n_clusters = max_n_clusters,
+                                                                                                                     n_iterations = SamplingTimes,
+                                                                                                                     std_times = std_times,
+                                                                                                                     current_sampling_size = current_sampling_size,
+                                                                                                                     min_nodes = 1,
+                                                                                                                     assign_labels = 'discretize',
+                                                                                                                     random_state = 0)
 
     cosine_matrix = CosineMatrix(AlignedFragmentsMat = aligned_fragments_mat,
                                  N_features = n_spectra)

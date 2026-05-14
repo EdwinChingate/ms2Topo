@@ -26,9 +26,9 @@ def align_fragments_engine(All_FeaturesTable,
                                                                Norm2One = Norm2One)
 
     aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features = AlignFragmentsEngine(all_ms2 = all_ms2,
-                                                                                                                Feature_module = Feature_module,
-                                                                                                                Intensity_to_explain = Intensity_to_explain,
-                                                                                                                min_spectra = min_spectra)
+                                                                                                               Feature_module = Feature_module,
+                                                                                                               Intensity_to_explain = Intensity_to_explain,
+                                                                                                               min_spectra = min_spectra)
 
     return [aligned_fragments_mat,
             aligned_fragments_mz_mat,

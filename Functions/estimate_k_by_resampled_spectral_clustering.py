@@ -7,6 +7,7 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
                                                 max_n_clusters,
                                                 n_iterations,
                                                 current_sampling_size,
+                                                std_times = 1,
                                                 min_nodes = 1,
                                                 assign_labels = 'discretize',
                                                 random_state = 0):
@@ -43,7 +44,7 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
     rng = np.random.default_rng(random_state)
 
     silhouette_evaluation_matrix = np.full((n_iterations, max_n_clusters),
-                                           np.nan)
+                                            np.nan)
 
     all_modules_by_iteration = []
     sampled_spectra_by_iteration = []
@@ -66,10 +67,17 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
 
     mean_silhouette_by_k = np.nanmean(silhouette_evaluation_matrix,
                                       axis = 0)
+    std_silhouette_by_k = np.nanstd(silhouette_evaluation_matrix,
+                                     axis = 0) 
+    top_mean_silhouette_by_k = mean_silhouette_by_k + std_times * std_silhouette_by_k
 
-    n_clusters = int(np.nanargmax(mean_silhouette_by_k) + 1)
+    best_silhouette_k = int(np.nanargmax(mean_silhouette_by_k))
+    best_silhouette = mean_silhouette_by_k[best_silhouette_k]
+    best_silhouette_std = std_silhouette_by_k[best_silhouette_k]
+    low_best_silhouette = best_silhouette - best_silhouette_std * std_times
+    plausible_k = np.where(top_mean_silhouette_by_k >= low_best_silhouette)[0]
+    n_clusters = np.min(plausible_k) + 1
 
     return [n_clusters,
-            silhouette_evaluation_matrix,
             all_modules_by_iteration,
             sampled_spectra_by_iteration]

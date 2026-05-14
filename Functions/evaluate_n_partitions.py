@@ -41,10 +41,10 @@ def evaluate_n_partitions(silhouette_evaluation_matrix,
                                                               n_clusters = n_clusters,
                                                               min_nodes = min_nodes,
                                                               assign_labels = assign_labels,
-                                                              random_state = random_state)
+                                                              random_state = random_state)        
 
-        silhouette_vector, closest_module_vector = silhouette_vector_calculator(CosineMat = cosine_matrix,
-                                                                                modules = modules)
+        silhouette_vector, closest_module_vector = silhouette_vector_calculator(modules = modules,
+                                                                                CosineMat = cosine_matrix)
 
         silhouette_evaluation_matrix[iteration, n_clusters - 1] = np.mean(silhouette_vector)
         modules_by_k[n_clusters] = modules

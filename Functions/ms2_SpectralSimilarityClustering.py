@@ -49,9 +49,15 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
 
     print(N_raw_modules)
 
+    global Feature_module_g
+    global All_FeaturesTable_g
+
+
+
     for feature_module_id in np.arange(N_raw_modules):
         Feature_module = RawModules[feature_module_id]
-
+        Feature_module_g = Feature_module
+        All_FeaturesTable_g = SummMS2_raw
         print(np.min(SummMS2_raw[Feature_module, 1]),
               np.max(SummMS2_raw[Feature_module, 1]))
 
