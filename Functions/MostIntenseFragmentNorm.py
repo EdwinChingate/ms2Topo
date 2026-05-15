@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+
 def MostIntenseFragmentNorm(consensus_spectra):
     consensus_spectra = np.array(consensus_spectra)
     maxInt = np.max(consensus_spectra[:, 6])

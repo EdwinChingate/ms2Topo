@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from module_silhouette_vector_summarizer import module_silhouette_vector_summarizer
 import numpy as np
-from silhouette_vector_calculator import silhouette_vector_calculator
+from module_silhouette_vector_summarizer import *
+from silhouette_vector_calculator import *
 
 def all_modules_silhouette_vector_summarizer(CosineMat,
                                              modules,

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from cohesion_separation_extractor import cohesion_separation_extractor
 import numpy as np
+from cohesion_separation_extractor import *
 
 def silhouette_vector_calculator(modules,
                                  CosineMat = None,

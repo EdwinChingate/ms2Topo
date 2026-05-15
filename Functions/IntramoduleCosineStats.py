@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import numpy as np
 from FlatMatrix_woDiag import *
+
 def IntramoduleCosineStats(moduleCosineMat,
                            percentile = 10):
     n = moduleCosineMat.shape[0]

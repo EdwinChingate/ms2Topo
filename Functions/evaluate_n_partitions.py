@@ -1,19 +1,26 @@
 from __future__ import annotations
 
 import numpy as np
-from silhouette_vector_calculator import silhouette_vector_calculator
-from sklearn_spectral_modules_from_cosine_matrix import sklearn_spectral_modules_from_cosine_matrix
+from silhouette_vector_calculator import *
+from sklearn_spectral_modules_from_cosine_matrix import *
 
-def evaluate_n_partitions(silhouette_evaluation_matrix,
-                          cosine_matrix,
-                          max_n_clusters,
-                          iteration,
-                          min_nodes = 1,
-                          assign_labels = 'discretize',
-                          random_state = 0):
+def evaluate_n_partitions(context,
+                          params):
     """
     Evaluate k = 1..max_n_clusters for a cosine matrix using mean silhouette.
+
+    Expected context keys:
+        silhouette_evaluation_matrix, cosine_matrix, max_n_clusters, iteration
     """
+
+    silhouette_evaluation_matrix = context["silhouette_evaluation_matrix"]
+    cosine_matrix = context["cosine_matrix"]
+    max_n_clusters = context["max_n_clusters"]
+    iteration = context["iteration"]
+
+    min_nodes = params["clustering"].get("min_nodes", 1)
+    assign_labels = params["clustering"].get("assign_labels", "discretize")
+    random_state = params["clustering"].get("random_state", 0)
 
     n_nodes = cosine_matrix.shape[0]
 
@@ -42,7 +49,7 @@ def evaluate_n_partitions(silhouette_evaluation_matrix,
                                                               n_clusters = n_clusters,
                                                               min_nodes = min_nodes,
                                                               assign_labels = assign_labels,
-                                                              random_state = random_state)        
+                                                              random_state = random_state)
 
         silhouette_vector, closest_module_vector = silhouette_vector_calculator(modules = modules,
                                                                                 CosineMat = cosine_matrix)

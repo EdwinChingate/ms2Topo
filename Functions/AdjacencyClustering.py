@@ -1,4 +1,5 @@
-import numpy as np
+from __future__ import annotations
+
 def AdjacencyClustering(ms2_id,AdjacencyList,Module=[]):
     CurrentModule=set(AdjacencyList[ms2_id])
     CurrentModule=CurrentModule-set(Module)   

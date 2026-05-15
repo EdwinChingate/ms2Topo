@@ -1,6 +1,9 @@
-import pandas as pd
-import os
+from __future__ import annotations
+
 import datetime
+import os
+import pandas as pd
+
 def Write_ms2ids_and_Consensus_ms2Spectra(feature_id,
                                           feature_module,
                                           consensus_spectraDF,

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+
 def Cosine_2VecSpec(AlignedSpecMat):
     S1_dot_S2 = np.sum(AlignedSpecMat[:, 1] * AlignedSpecMat[:, 2])
     S1_dot_S1 = np.sum(AlignedSpecMat[:, 1] * AlignedSpecMat[:, 1])
@@ -8,4 +11,3 @@ def Cosine_2VecSpec(AlignedSpecMat):
         return 0
     Cosine = S1_dot_S2 / np.sqrt(dotXdot)
     return Cosine
-

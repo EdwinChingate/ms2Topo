@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from cohesion_vector_calculator import cohesion_vector_calculator
-from nodes2centroids_cohesion_approximation import nodes2centroids_cohesion_approximation
 import numpy as np
-from separation_vector_calculator import separation_vector_calculator
+from cohesion_vector_calculator import *
+from nodes2centroids_cohesion_approximation import *
+from separation_vector_calculator import *
 
 def cohesion_separation_extractor(n_nodes,
                                   modules,

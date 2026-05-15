@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 from ConsensusFragment import *
 from MostIntenseFragmentNorm import *
-# I'm still missing alternative the normalization to the square for the consensus spectra
+
 def ConsensusSpectra(module,
                      AlignedFragments_mz_Mat,
                      AlignedFragmentsMat,

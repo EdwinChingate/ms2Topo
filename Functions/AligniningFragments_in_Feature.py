@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+
 def AligniningFragments_in_Feature(Frag_Modules,
                                    All_ms2,
                                    N_features):

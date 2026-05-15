@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import numpy as np
 from Cosine_2VecSpec import *
+
 def CosineMatrix(AlignedFragmentsMat, N_features):
     CosineMat = np.zeros((N_features, N_features))
     for feature_id1 in np.arange(N_features, dtype = 'int'):
@@ -9,4 +12,3 @@ def CosineMatrix(AlignedFragmentsMat, N_features):
             CosineMat[feature_id1, feature_id2] = Cosine
             CosineMat[feature_id2, feature_id1] = Cosine
     return CosineMat
-

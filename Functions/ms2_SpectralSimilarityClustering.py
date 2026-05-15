@@ -1,46 +1,36 @@
 from __future__ import annotations
 
-from AdjacencyListFeatures import AdjacencyListFeatures
-from ms2_FeaturesDifferences import ms2_FeaturesDifferences
-from ms2_feat_modules import ms2_feat_modules
 import numpy as np
 import pandas as pd
+from AdjacencyListFeatures import *
+from ms2_FeaturesDifferences import *
+from ms2_feat_modules import *
 
-def ms2_SpectralSimilarityClustering(SummMS2_raw,
-                                     SampleName = '',
-                                     SamplesNames = [],
-                                     slice_id = 0,
-                                     feature_id = 0,
-                                     mz_col = 1,
-                                     RT_col = 2,
-                                     RT_tol = 20,
-                                     mz_Tol = 1e-2,
-                                     sample_id_col = -1,
-                                     ms2_spec_id_col = 0,
-                                     ms2Folder = 'ms2_spectra',
-                                     ToAdd = 'mzML',
-                                     cos_tol = 0.9,
-                                     Norm2One = False,
-                                     min_spectra_fraction = 0.3,
-                                     Intensity_to_explain = 0.9,
-                                     percentile = 10,
-                                     percentile_mz = 5,
-                                     percentile_Int = 10,
-                                     SamplingTimes = 20,
-                                     max_Nspectra_cluster = 8,
-                                     Nspectra_sampling = 100):
+def ms2_SpectralSimilarityClustering(context,
+                                     params):
     """
     Cluster all raw feature modules within one m/z slice.
+
+    Expected context keys:
+        SummMS2_raw, SamplesNames, slice_id, feature_id
+    Optional context key:
+        SampleName
     """
+
+    SummMS2_raw = context["SummMS2_raw"]
+    SamplesNames = context.get("SamplesNames", [])
+    SampleName = context.get("SampleName", "")
+    slice_id = context.get("slice_id", 0)
+    feature_id = context.get("feature_id", 0)
 
     if len(SamplesNames) == 0:
         SamplesNames = [SampleName]
 
     AdjacencyList, feat_ids = AdjacencyListFeatures(MS2_features = SummMS2_raw,
-                                                    mz_col = mz_col,
-                                                    RT_col = RT_col,
-                                                    RT_tol = RT_tol,
-                                                    mz_Tol = mz_Tol)
+                                                    mz_col = params["columns"]["mz_col"],
+                                                    RT_col = params["columns"]["RT_col"],
+                                                    RT_tol = params["feature_grouping"]["RT_tol"],
+                                                    mz_Tol = params["feature_grouping"]["mz_Tol"])
 
     RawModules = ms2_feat_modules(AdjacencyList = AdjacencyList,
                                   ms2_ids = feat_ids)
@@ -51,26 +41,17 @@ def ms2_SpectralSimilarityClustering(SummMS2_raw,
     for feature_module_id in np.arange(N_raw_modules):
         Feature_module = RawModules[feature_module_id]
 
-        feature_id, AlignedSamplesList = ms2_FeaturesDifferences(All_FeaturesTable = SummMS2_raw,
-                                                                 Feature_module = Feature_module,
-                                                                 AlignedSamplesList = AlignedSamplesList,
-                                                                 SamplesNames = SamplesNames,
-                                                                 sample_id_col = sample_id_col,
-                                                                 ms2_spec_id_col = ms2_spec_id_col,
-                                                                 ms2Folder = ms2Folder,
-                                                                 ToAdd = ToAdd,
-                                                                 cos_tol = cos_tol,
-                                                                 Norm2One = Norm2One,
-                                                                 feature_id = feature_id,
-                                                                 slice_id = slice_id,
-                                                                 min_spectra_fraction = min_spectra_fraction,
-                                                                 Intensity_to_explain = Intensity_to_explain,
-                                                                 percentile = percentile,
-                                                                 percentile_mz = percentile_mz,
-                                                                 percentile_Int = percentile_Int,
-                                                                 SamplingTimes = SamplingTimes,
-                                                                 max_Nspectra_cluster = max_Nspectra_cluster,
-                                                                 Nspectra_sampling = Nspectra_sampling)
+        feature_context = {
+            "All_FeaturesTable": SummMS2_raw,
+            "Feature_module": Feature_module,
+            "AlignedSamplesList": AlignedSamplesList,
+            "SamplesNames": SamplesNames,
+            "feature_id": feature_id,
+            "slice_id": slice_id,
+        }
+
+        feature_id, AlignedSamplesList = ms2_FeaturesDifferences(context = feature_context,
+                                                                 params = params)
 
     feature_descriptor_columns = ['median_mz(Da)',
                                   'min_mz',

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from AdjacencyClustering import *
+
 def ms2_feat_modules(AdjacencyList,ms2_ids):
     Modules=[]
     while len(ms2_ids)>0:        

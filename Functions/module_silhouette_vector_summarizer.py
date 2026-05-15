@@ -1,5 +1,7 @@
 from __future__ import annotations
+
 import numpy as np
+
 def module_silhouette_vector_summarizer(silhouette_vector,
                                         module,
                                         percentile = 10):

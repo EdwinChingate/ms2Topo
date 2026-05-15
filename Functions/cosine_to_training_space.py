@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from Cosine_2VecSpec import Cosine_2VecSpec
 import numpy as np
+from Cosine_2VecSpec import *
 
 def cosine_to_training_space(aligned_query_mat,
                              training_mat):

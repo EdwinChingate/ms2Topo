@@ -1,4 +1,9 @@
+from __future__ import annotations
+
 import numpy as np
+
+# TODO: unresolved names: fragment
+
 def minimalSpectrum(FragmentsVec,
                     FragmentAbundanceVec,
                     fractionIntensity = 0,

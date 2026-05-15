@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from modules_centroiding import modules_centroiding
 import numpy as np
+from modules_centroiding import *
 
 def ms2_spectra_centroiding(modules,
                             aligned_fragments_mat):

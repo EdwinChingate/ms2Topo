@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+
 def AdjacencyListFeatures(MS2_features,
                           mz_col = 3,
                           mz_CI_col = 8,

@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import numpy as np
+
 def AdjacencyList_ms2Fragments(All_ms2,
                                std_distance = 3,
                                ppm_tol = 20):

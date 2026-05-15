@@ -1,26 +1,30 @@
 from __future__ import annotations
 
-from evaluate_n_partitions import evaluate_n_partitions
 import numpy as np
-from retrieve_random_aligned_fragments import retrieve_random_aligned_fragments
+from evaluate_n_partitions import *
+from retrieve_random_aligned_fragments import *
 
-def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
-                                                max_n_clusters,
-                                                n_iterations,
-                                                current_sampling_size,
-                                                std_times = 1,
-                                                min_nodes = 1,
-                                                assign_labels = 'discretize',
-                                                random_state = 0):
+def estimate_k_by_resampled_spectral_clustering(context,
+                                                params):
     """
     Estimate the number of spectral partitions using repeated random subsampling.
 
+    Expected context keys:
+        aligned_fragments_mat, max_n_clusters, current_sampling_size
+
     Returns:
         n_clusters
-        silhouette_evaluation_matrix
         all_modules_by_iteration
         sampled_spectra_by_iteration
     """
+
+    aligned_fragments_mat = context["aligned_fragments_mat"]
+    max_n_clusters = context["max_n_clusters"]
+    current_sampling_size = context["current_sampling_size"]
+
+    n_iterations = params["clustering"]["SamplingTimes"]
+    std_times = params["clustering"].get("std_times", 1)
+    random_state = params["clustering"].get("random_state", 0)
 
     n_spectra = aligned_fragments_mat.shape[1] - 1
 
@@ -30,8 +34,8 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
 
     max_n_clusters = min(current_sampling_size // 3,
                          max_n_clusters) #3
-    max_n_clusters =max(max_n_clusters,
-                        1)
+    max_n_clusters = max(max_n_clusters,
+                         1)
 
     rng = np.random.default_rng(random_state)
 
@@ -46,13 +50,15 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
                                                                                                                       current_sampling_size = current_sampling_size,
                                                                                                                       rng = rng)
 
-        silhouette_evaluation_matrix, modules_by_k = evaluate_n_partitions(silhouette_evaluation_matrix = silhouette_evaluation_matrix,
-                                                                           cosine_matrix = cosine_matrix,
-                                                                           max_n_clusters = max_n_clusters,
-                                                                           iteration = iteration,
-                                                                           min_nodes = min_nodes,
-                                                                           assign_labels = assign_labels,
-                                                                           random_state = random_state)
+        evaluation_context = {
+            "silhouette_evaluation_matrix": silhouette_evaluation_matrix,
+            "cosine_matrix": cosine_matrix,
+            "max_n_clusters": max_n_clusters,
+            "iteration": iteration,
+        }
+
+        silhouette_evaluation_matrix, modules_by_k = evaluate_n_partitions(context = evaluation_context,
+                                                                           params = params)
 
         all_modules_by_iteration.append(modules_by_k)
         sampled_spectra_by_iteration.append(sampled_spectrum_ids)
@@ -60,7 +66,7 @@ def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
     mean_silhouette_by_k = np.nanmean(silhouette_evaluation_matrix,
                                       axis = 0)
     std_silhouette_by_k = np.nanstd(silhouette_evaluation_matrix,
-                                     axis = 0) 
+                                     axis = 0)
     top_mean_silhouette_by_k = mean_silhouette_by_k + std_times * std_silhouette_by_k
 
     best_silhouette_k = int(np.nanargmax(mean_silhouette_by_k))
