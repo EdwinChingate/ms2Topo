@@ -1,5 +1,6 @@
 from __future__ import annotations
-from modules_centroiding import *
+
+from modules_centroiding import modules_centroiding
 import numpy as np
 
 def ms2_spectra_centroiding(modules,

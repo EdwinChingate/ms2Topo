@@ -1,7 +1,8 @@
 from __future__ import annotations
-from AdjacencyListFeatures import *
-from ms2_FeaturesDifferences import *
-from ms2_feat_modules import *
+
+from AdjacencyListFeatures import AdjacencyListFeatures
+from ms2_FeaturesDifferences import ms2_FeaturesDifferences
+from ms2_feat_modules import ms2_feat_modules
 import numpy as np
 import pandas as pd
 

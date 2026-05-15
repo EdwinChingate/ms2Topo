@@ -1,7 +1,8 @@
 from __future__ import annotations
-from evaluate_n_partitions import *
+
+from evaluate_n_partitions import evaluate_n_partitions
 import numpy as np
-from retrieve_random_aligned_fragments import *
+from retrieve_random_aligned_fragments import retrieve_random_aligned_fragments
 
 def estimate_k_by_resampled_spectral_clustering(aligned_fragments_mat,
                                                 max_n_clusters,

@@ -1,4 +1,15 @@
 from __future__ import annotations
+
+from CosineMatrix import CosineMatrix
+from IntramoduleSimilarityCalc import IntramoduleSimilarityCalc
+from align_fragments_engine import align_fragments_engine
+from all_modules_silhouette_vector_summarizer import all_modules_silhouette_vector_summarizer
+from estimate_k_by_resampled_spectral_clustering import estimate_k_by_resampled_spectral_clustering
+import numpy as np
+from sklearn_spectral_modules_from_cosine_matrix import sklearn_spectral_modules_from_cosine_matrix
+
+# TODO: unresolved names: module
+
 def clustering_spectra_with_spectral_clustering(Feature_module,
                                                 All_FeaturesTable,
                                                 SamplesNames,
@@ -30,6 +41,15 @@ def clustering_spectra_with_spectral_clustering(Feature_module,
     n_spectra = len(Feature_module)
     min_spectra = int(np.ceil(min_spectra_fraction * n_spectra))
     aligned_fragments_mat, aligned_fragments_mz_mat, explained_fraction_int, n_features, Spectra_idVec = align_fragments_engine(All_FeaturesTable = All_FeaturesTable,
+                                                                                                                                Feature_module = Feature_module,
+                                                                                                                                SamplesNames = SamplesNames,
+                                                                                                                                sample_id_col = sample_id_col,
+                                                                                                                                ms2_spec_id_col = ms2_spec_id_col,
+                                                                                                                                ms2Folder = ms2Folder,
+                                                                                                                                ToAdd = ToAdd,
+                                                                                                                                Norm2One = Norm2One,
+                                                                                                                                Intensity_to_explain = Intensity_to_explain,
+                                                                                                                                min_spectra = min_spectra)
 
     filtered_feature_module = np.array(Feature_module)[Spectra_idVec].tolist()
 

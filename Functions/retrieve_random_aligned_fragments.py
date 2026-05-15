@@ -1,5 +1,6 @@
 from __future__ import annotations
-from CosineMatrix import *
+
+from CosineMatrix import CosineMatrix
 import numpy as np
 
 def retrieve_random_aligned_fragments(aligned_fragments_mat,

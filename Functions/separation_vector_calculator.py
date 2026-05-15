@@ -1,5 +1,6 @@
 from __future__ import annotations
-from nodes_modules_cosine_similarity import *
+
+from nodes_modules_cosine_similarity import nodes_modules_cosine_similarity
 import numpy as np
 
 def separation_vector_calculator(CosineMat,

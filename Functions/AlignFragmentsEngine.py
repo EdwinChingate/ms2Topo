@@ -1,8 +1,9 @@
 from __future__ import annotations
-from AdjacencyList_ms2Fragments import *
-from AligniningFragments_in_Feature import *
-from minimalAlignedFragmentsMat import *
-from ms2_feat_modules import *
+
+from AdjacencyList_ms2Fragments import AdjacencyList_ms2Fragments
+from AligniningFragments_in_Feature import AligniningFragments_in_Feature
+from minimalAlignedFragmentsMat import minimalAlignedFragmentsMat
+from ms2_feat_modules import ms2_feat_modules
 import numpy as np
 
 def AlignFragmentsEngine(all_ms2,

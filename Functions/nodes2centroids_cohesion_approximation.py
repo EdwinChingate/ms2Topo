@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import numpy as np
 
 def nodes2centroids_cohesion_approximation(nodes_modules_cosine_matrix):

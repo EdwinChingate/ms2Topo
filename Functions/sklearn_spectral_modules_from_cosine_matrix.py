@@ -1,4 +1,5 @@
 from __future__ import annotations
+from sklearn.cluster import SpectralClustering
 import numpy as np
 
 # TODO: unresolved names: SpectralClustering
@@ -63,3 +64,5 @@ def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
 
     return np.array(modules,
                     dtype = object)
+                    
+#from sklearn.cluster import SpectralClustering                    

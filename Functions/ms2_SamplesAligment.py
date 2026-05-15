@@ -1,9 +1,7 @@
 from __future__ import annotations
-from ShowDF import *
-from ms2_SpectralSimilarityClustering import *
-import pandas as pd
 
-# TODO: unresolved names: home
+from ms2_SpectralSimilarityClustering import ms2_SpectralSimilarityClustering
+import pandas as pd
 
 def ms2_SamplesAligment(ProjectName,
                         All_SummMS2Table,
@@ -67,58 +65,3 @@ def ms2_SamplesAligment(ProjectName,
 
     return pd.concat(aligned_samples_dfs,
                      ignore_index = True)
-
-
-# In[8]:
-
-
-silhouetteList = []
-cosine_matrix = 0
-test_feature_module = 0
-all_features_table = 0
-Feature_module_g = 0
-All_FeaturesTable = 0
-
-Norm2One_g =  0
-ms2Folder_g =  0
-sample_id_col_g =  0
-ms2_spec_id_col_g =  0
-
-
-# In[15]:
-
-
-import time
-
-#from ms2_SamplesAligment import *
-ResultsFolder = home + '/Projects/CarbonSource/ms2_spectra_Summ-20260403'
-ms2Folder = home + '/Projects/CarbonSource/ms2_spectra-20260403'
-WorkingDirectory = home + '/Projects/CarbonSource'
-#for cos_tol in np.linspace(0.7,0.99,10):
-t0 = time.time()
-
-AlignedSamplesDF = ms2_SamplesAligment(ProjectName = 'CarbonSource',
-                                       All_SummMS2Table = All_SummMS2Table,
-                                       EdgesMat = EdgesMat,
-                                       SamplesNames = SamplesNames,
-                                       RT_tol = 30,
-                                       mz_Tol = 5e-4,
-                                       cos_tol = 0.6,
-                                       min_N_ms2_spectra = 3,
-                                       ms2Folder = ms2Folder,
-                                       ToAdd = 'mzML',
-                                       Norm2One = True)
-print((time.time() - t0) / 60)
-ShowDF(AlignedSamplesDF)
-
-
-# In[46]:
-
-
-9.79/1e6*243
-
-
-# In[52]:
-
-
-ShowDF(AlignedSamplesDF)

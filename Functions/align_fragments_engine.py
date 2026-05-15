@@ -1,6 +1,7 @@
 from __future__ import annotations
-from AlignFragmentsEngine import *
-from Retrieve_and_Join_ms2_for_feature import *
+
+from AlignFragmentsEngine import AlignFragmentsEngine
+from Retrieve_and_Join_ms2_for_feature import Retrieve_and_Join_ms2_for_feature
 
 def align_fragments_engine(All_FeaturesTable,
                            Feature_module,

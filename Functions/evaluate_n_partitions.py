@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 import numpy as np
-from silhouette_vector_calculator import *
-from sklearn_spectral_modules_from_cosine_matrix import *
+from silhouette_vector_calculator import silhouette_vector_calculator
+from sklearn_spectral_modules_from_cosine_matrix import sklearn_spectral_modules_from_cosine_matrix
 
 def evaluate_n_partitions(silhouette_evaluation_matrix,
                           cosine_matrix,

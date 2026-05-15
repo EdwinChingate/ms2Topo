@@ -1,6 +1,7 @@
 from __future__ import annotations
-from Update_ids_FeatureModules import *
-from clustering_spectra_with_spectral_clustering import *
+
+from Update_ids_FeatureModules import Update_ids_FeatureModules
+from clustering_spectra_with_spectral_clustering import clustering_spectra_with_spectral_clustering
 
 def ms2_FeaturesDifferences(All_FeaturesTable,
                             Feature_module,
