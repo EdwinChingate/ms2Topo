@@ -12,7 +12,7 @@ def ClosingModule(context,
     Expected context keys:
         module, AlignedFragments_mz_Mat, AlignedFragmentsMat, Feature_module,
         feature_id, All_FeaturesTable, AlignedSamplesList, SamplesNames,
-        IntramoduleCosineStatsVec, sampling_samples
+        SilhouetteStatsVec, IntramoduleCosineStatsVec, sampling_samples
     """
 
     module = context["module"]
@@ -22,6 +22,7 @@ def ClosingModule(context,
     All_FeaturesTable = context["All_FeaturesTable"]
     AlignedSamplesList = context["AlignedSamplesList"]
     SamplesNames = context["SamplesNames"]
+    SilhouetteStatsVec = context["SilhouetteStatsVec"]
     IntramoduleCosineStatsVec = context["IntramoduleCosineStatsVec"]
     sampling_samples = context.get("sampling_samples", 0)
 
@@ -61,6 +62,7 @@ def ClosingModule(context,
     AlignedSamplesVec = FeatureModuleStats(All_FeaturesTable = All_FeaturesTable,
                                            module = module,
                                            SamplesNames = SamplesNames,
+                                           SilhouetteStatsVec = SilhouetteStatsVec,
                                            IntramoduleCosineStatsVec = IntramoduleCosineStatsVec,
                                            feature_id = feature_id,
                                            sampling_samples = sampling_samples)

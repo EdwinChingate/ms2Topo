@@ -1,14 +1,36 @@
 from __future__ import annotations
 
 import numpy as np
-from Cosine_2VecSpec import *
 
-def CosineMatrix(AlignedFragmentsMat, N_features):
-    CosineMat = np.zeros((N_features, N_features))
-    for feature_id1 in np.arange(N_features, dtype = 'int'):
-        for feature_id2 in np.arange(feature_id1, N_features, dtype = 'int'):
-            AlignedSpecMat = AlignedFragmentsMat[:, [0, feature_id1 + 1, feature_id2 + 1]]
-            Cosine = Cosine_2VecSpec(AlignedSpecMat = AlignedSpecMat)
-            CosineMat[feature_id1, feature_id2] = Cosine
-            CosineMat[feature_id2, feature_id1] = Cosine
-    return CosineMat
+def CosineMatrix(AlignedFragmentsMat,
+                 N_features,
+                 dtype=np.float32):
+    """
+    Fast vectorized cosine matrix.
+
+    Rows of AlignedFragmentsMat are aligned fragments.
+    Column 0 is fragment m/z.
+    Columns 1..N_features are spectra.
+    """
+
+    spectra_mat = np.asarray(AlignedFragmentsMat[:, 1:N_features + 1],
+                             dtype=dtype)
+
+    dot_mat = spectra_mat.T @ spectra_mat
+
+    norms = np.sqrt(np.sum(spectra_mat * spectra_mat,
+                           axis=0))
+
+    denom = np.outer(norms,
+                     norms)
+
+    CosineMat = np.zeros_like(dot_mat,
+                              dtype=dtype)
+
+    valid = denom > 0
+
+    CosineMat[valid] = dot_mat[valid] / denom[valid]
+
+    CosineMat = (CosineMat + CosineMat.T) / 2
+
+    return CosineMat    

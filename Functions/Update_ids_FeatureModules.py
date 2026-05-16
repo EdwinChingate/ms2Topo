@@ -27,11 +27,13 @@ def Update_ids_FeatureModules(context,
     AlignedFragmentsMat = feature_cluster_data["AlignedFragmentsMat"]
     AlignedFragments_mz_Mat = feature_cluster_data["AlignedFragments_mz_Mat"]
     modules_silhouette_summary_table = feature_cluster_data["modules_silhouette_summary_table"]
+    IntramoduleSimilarity = feature_cluster_data["IntramoduleSimilarity"]
 
     module_id = 0
 
     for module in Modules:
-        IntramoduleCosineStatsVec = modules_silhouette_summary_table[module_id, 1: 6]
+        SilhouetteStatsVec = modules_silhouette_summary_table[module_id, 1: 6]
+        IntramoduleCosineStatsVec = IntramoduleSimilarity[module_id, 1: 6]
 
         closing_context = {
             "module": module,
@@ -41,6 +43,7 @@ def Update_ids_FeatureModules(context,
             "AlignedFragments_mz_Mat": AlignedFragments_mz_Mat,
             "AlignedSamplesList": AlignedSamplesList,
             "SamplesNames": SamplesNames,
+            "SilhouetteStatsVec": SilhouetteStatsVec,
             "IntramoduleCosineStatsVec": IntramoduleCosineStatsVec,
             "feature_id": feature_id,
             "sampling_samples": sampling_samples,
