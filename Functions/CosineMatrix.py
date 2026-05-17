@@ -31,6 +31,5 @@ def CosineMatrix(AlignedFragmentsMat,
 
     CosineMat[valid] = dot_mat[valid] / denom[valid]
 
-    CosineMat = (CosineMat + CosineMat.T) / 2
 
     return CosineMat    
