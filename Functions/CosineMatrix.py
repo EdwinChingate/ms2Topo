@@ -4,7 +4,7 @@ import numpy as np
 
 def CosineMatrix(AlignedFragmentsMat,
                  N_features,
-                 dtype=np.float32):
+                 dtype = np.float32):
     """
     Fast vectorized cosine matrix.
 
@@ -25,11 +25,11 @@ def CosineMatrix(AlignedFragmentsMat,
                      norms)
 
     CosineMat = np.zeros_like(dot_mat,
-                              dtype=dtype)
+                              dtype=dtype) 
 
     valid = denom > 0
 
-    CosineMat[valid] = dot_mat[valid] / denom[valid]
+    CosineMat[valid] = dot_mat[valid] / denom[valid] 
 
 
-    return CosineMat    
+    return CosineMat

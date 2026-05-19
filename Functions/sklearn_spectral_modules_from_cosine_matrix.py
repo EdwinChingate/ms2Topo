@@ -1,9 +1,7 @@
 from __future__ import annotations
 from sklearn.cluster import SpectralClustering
-
 import numpy as np
 
-# TODO: unresolved names: SpectralClustering
 
 def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
                                                 n_clusters,
@@ -11,10 +9,14 @@ def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
                                                 assign_labels = 'discretize',
                                                 random_state = 0,
                                                 clip_negative = True,
-                                                unit_diagonal = True):
+                                                unit_diagonal = True,
+                                                spectral_eps = 1e-10):
     """
-    Run spectral clustering from a precomputed cosine/affinity matrix and return
-    modules as sets of local node indices.
+    Run spectral clustering from a precomputed cosine matrix.
+
+    The input cosine_matrix should remain the observed biological/MS2
+    similarity matrix. spectral_eps is only a numerical regularizer for
+    the spectral affinity matrix.    
     """
 
     n_nodes = len(cosine_matrix)
@@ -37,7 +39,7 @@ def sklearn_spectral_modules_from_cosine_matrix(cosine_matrix,
                      n_nodes)
 
     affinity_matrix = np.array(cosine_matrix,
-                               dtype = float).copy()
+                               dtype = float).copy() + spectral_eps
 
     affinity_matrix = (affinity_matrix + affinity_matrix.T) / 2
 

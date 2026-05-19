@@ -34,7 +34,7 @@ def ms2_SamplesAligment(context,
                                                                         params = params)
 
         TableLoc = ProjectName + '-' + str(slice_id) + '.csv'
-        # AlignedSamplesDF.to_csv(TableLoc)
+        AlignedSamplesDF.to_csv(TableLoc)
 
         aligned_samples_dfs.append(AlignedSamplesDF)
 
