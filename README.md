@@ -52,7 +52,7 @@ The final feature is defined by reproducible fragmentation structure, not by MS1
 
 ## Quick start
 
-See [[INSTALLATION.md]](INSTALLATION.md) for full setup instructions.
+See [INSTALLATION.md](INSTALLATION) for full setup instructions.
 
 Clone the repository, install the dependencies, then open:
 
@@ -60,7 +60,7 @@ Clone the repository, install the dependencies, then open:
 jupyter notebook ms2Topo.ipynb
 ```
 
-The full example workflow is available in [[ms2Topo.ipynb]](ms2Topo)
+The full example workflow is available in [ms2Topo](ms2Topo.ipynb)
 
 ---
 
