@@ -52,7 +52,7 @@ The final feature is defined by reproducible fragmentation structure, not by MS1
 
 ## Quick start
 
-See [INSTALLATION](INSTALLATION.md) for setup instructions.
+See [`INSTALLATION`](INSTALLATION.md) for setup instructions.
 
 Clone the repository, install the dependencies, then open:
 
@@ -60,7 +60,7 @@ Clone the repository, install the dependencies, then open:
 jupyter notebook ms2Topo.ipynb
 ```
 
-The full example workflow is available in [ms2Topo](ms2Topo.ipynb)
+The full example workflow is available in [`ms2Topo`](ms2Topo.ipynb)
 
 ---
 
@@ -222,21 +222,29 @@ If you use ms2Topo in research, please cite the GitHub repository and the associ
 
 ## License
 
-This project is released under the MIT License. See [`LICENSE.md`](LICENSE.md).
+This project is released under the MIT License. See [`LICENSE`](LICENSE.md).
 
 ---
 
-## Maintainer
+## Developer and maintainer
 
-**Edwin Chingate**
+**Edwin Chingate**  
+Colombia
 
-ms2Topo emerged from PhD research on microbial transformation of trace organic chemicals using LC-HRMS/MS. The project grows from a simple observation: repeated DDA spectra should be treated as structural evidence, not as disposable redundancy.
+ms2Topo originated from my PhD research on microbial transformation of pharmaceutical compounds using DDA LC-HRMS/MS. While analyzing years of MS/MS data, I became interested in a recurring problem: many workflows treat repeated DDA spectra as redundancy or noise, while relying heavily on MS1-first feature definitions.
+
+I built ms2Topo to explore a different strategy. The framework treats repeated MS2 spectra as statistical replication of fragmentation evidence and declares analytical features only when the spectra form stable, coherent communities in similarity space.
+
+I am currently completing my PhD dissertation and am open to paid roles, research collaborations, or contract work in computational mass spectrometry and scientific software. Relevant roles include:
+
+- Computational Mass Spectrometry Scientist
+- Scientific Software Engineer
+- Research Software Engineer
+- Computational Metabolomics / Non-target Screening Scientist
+
+I am especially interested in teams working with real LC-HRMS/MS datasets, DDA/DIA workflows, metabolomics, non-target screening, spectral similarity, molecular networking, or scientific software infrastructure.
+
+If ms2Topo is relevant to your lab, platform, or product roadmap, I would be happy to talk.
 
 - Email: edwinchingate@gmail.com
 - LinkedIn: <https://www.linkedin.com/in/edwinchingate/>
-
----
-
-## Collaboration
-
-If ms2Topo is relevant to your lab, platform, or scientific software project, feel free to reach out about collaboration, benchmarking, or computational MS/MS development.
