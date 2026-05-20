@@ -52,7 +52,7 @@ The final feature is defined by reproducible fragmentation structure, not by MS1
 
 ## Quick start
 
-See [INSTALLATION.md](INSTALLATION) for full setup instructions.
+See [INSTALLATION](INSTALLATION.md) for setup instructions.
 
 Clone the repository, install the dependencies, then open:
 
