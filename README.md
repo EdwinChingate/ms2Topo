@@ -1,5 +1,6 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Status: Research%20Prototype](https://img.shields.io/badge/status-research%20prototype-orange)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20320152.svg)](https://doi.org/10.5281/zenodo.20320152)
 
 ![ms2Topo](ms2Topo.png)
 
@@ -216,7 +217,15 @@ ms2Topo/
 
 ## Citation
 
-If you use ms2Topo in research, please cite the GitHub repository and the associated manuscript or preprint when available.
+## Citation
+
+If you use ms2Topo in research, please cite the archived Zenodo release:
+
+> Chingate, E. (2026). ms2Topo: MS2-first feature construction for DDA LC-HRMS/MS. Zenodo. https://doi.org/10.5281/zenodo.20320152
+
+Please also cite the GitHub repository when referring to the active development version:
+
+<https://github.com/EdwinChingate/ms2Topo>
 
 ---
 
