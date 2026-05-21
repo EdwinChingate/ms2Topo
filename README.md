@@ -65,6 +65,15 @@ The full example workflow is available in [`ms2Topo`](ms2Topo.ipynb)
 
 ---
 
+## Documentation
+
+For a workflow-oriented function reference, see the documentation wiki:
+
+<https://github.com/EdwinChingate/ms2Topo/wiki>
+
+The wiki follows the main data transformation from `.mzML` files and precursor/MS2 summaries to fragment alignment, spectral clustering, consensus spectra, and final ms2Topo feature objects.
+---
+
 ## Inputs
 
 ms2Topo starts from `.mzML` files acquired by DDA LC-HRMS/MS. The example notebook extracts MS2 spectra from these files and builds the intermediate tables used by the alignment workflow.
@@ -214,8 +223,6 @@ ms2Topo/
 ```
 
 ---
-
-## Citation
 
 ## Citation
 
