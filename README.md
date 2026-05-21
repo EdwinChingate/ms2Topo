@@ -72,6 +72,7 @@ For a workflow-oriented function reference, see the documentation wiki:
 <https://github.com/EdwinChingate/ms2Topo/wiki>
 
 The wiki follows the main data transformation from `.mzML` files and precursor/MS2 summaries to fragment alignment, spectral clustering, consensus spectra, and final ms2Topo feature objects.
+
 ---
 
 ## Inputs
