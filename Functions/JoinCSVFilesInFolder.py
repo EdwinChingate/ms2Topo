@@ -44,5 +44,3 @@ def JoinCSVFilesInFolder(folder_path,
                                       ascending=False)
 
     return joined_df
-    
-from __future__ import annotations

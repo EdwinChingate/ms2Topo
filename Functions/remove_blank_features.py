@@ -129,5 +129,3 @@ def remove_blank_features(AlignedSamplesDF,
     return [CarbonSourceFeatures,
             CarbonSourceFeatures_RT,
             FeatureIDSet_by_Group]
-
-from __future__ import annotations
