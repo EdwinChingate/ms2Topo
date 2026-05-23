@@ -20,7 +20,6 @@ def BatchExtract_All_MS2_Spectra(DataFolder,
     dataset_list = [x for x in os.listdir(DataFolder) if not x.startswith('.')]
 
     Total = len(dataset_list)
-    c = 0
 
     for datasetname in dataset_list:
         try:
@@ -64,6 +63,3 @@ def BatchExtract_All_MS2_Spectra(DataFolder,
 
         except Exception as error:
             print('FAILED:', datasetname, error)
-
-        print(c, int(c / max(Total, 1) * 100))
-        c += 1
