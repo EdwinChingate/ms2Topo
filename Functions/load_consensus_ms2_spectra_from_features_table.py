@@ -17,6 +17,7 @@ def load_consensus_ms2_spectra_from_features_table(features_table_df,
                                                    mz_std_col = "IQR_mz(Da)",
                                                    mz_iqr_ppm_col = "IQR_mz(ppm)",
                                                    drop_nonpositive_intensity = True,
+                                                   normalization = "l2",
                                                    continue_on_error = True):
     """
     Load saved consensus spectra corresponding to feat_id values in a features table.
@@ -48,7 +49,8 @@ def load_consensus_ms2_spectra_from_features_table(features_table_df,
                                                                 intensity_col = intensity_col,
                                                                 mz_std_col = mz_std_col,
                                                                 mz_iqr_ppm_col = mz_iqr_ppm_col,
-                                                                drop_nonpositive_intensity = drop_nonpositive_intensity)
+                                                                drop_nonpositive_intensity = drop_nonpositive_intensity,
+                                                                normalization = normalization)
 
             if len(consensus_spectrum_df) == 0:
                 raise ValueError("Consensus spectrum has no positive fragments after filtering.")

@@ -24,8 +24,8 @@ def aligned_matrices_to_dataframes(aligned_fragments_mat,
     aligned_mz_df = base_df.copy()
 
     for spectrum_id, feat_id in enumerate(feat_id_vec):
-        aligned_intensity_df[f"feat_{feat_id}"] = aligned_fragments_mat[:, spectrum_id + 1]
-        aligned_mz_df[f"feat_{feat_id}"] = aligned_fragments_mz_mat[:, spectrum_id + 1]
+        aligned_intensity_df[str(feat_id)] = aligned_fragments_mat[:, spectrum_id + 1]
+        aligned_mz_df[str(feat_id)] = aligned_fragments_mz_mat[:, spectrum_id + 1]
 
     long_rows = []
 

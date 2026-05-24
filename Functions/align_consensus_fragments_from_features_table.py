@@ -15,6 +15,7 @@ def align_consensus_fragments_from_features_table(features_table_df,
                                                   mz_std_col = "IQR_mz(Da)",
                                                   mz_iqr_ppm_col = "IQR_mz(ppm)",
                                                   drop_nonpositive_intensity = True,
+                                                  normalization = "l2",
                                                   intensity_to_explain = 1.0,
                                                   min_spectra = 1,
                                                   continue_on_error = True):
@@ -36,6 +37,7 @@ def align_consensus_fragments_from_features_table(features_table_df,
                                                                    mz_std_col = mz_std_col,
                                                                    mz_iqr_ppm_col = mz_iqr_ppm_col,
                                                                    drop_nonpositive_intensity = drop_nonpositive_intensity,
+                                                                   normalization = normalization,
                                                                    continue_on_error = continue_on_error)
 
     all_consensus_ms2_df = loaded_result["all_consensus_ms2_df"]
