@@ -161,5 +161,3 @@ def match_molecules_to_features_by_formula(features_table_df,
             "candidate_hits_df": candidate_hits_df,
             "features_subset_df": features_subset_df,
             "matched_feat_ids": matched_feat_ids}
-            
-from __future__ import annotations

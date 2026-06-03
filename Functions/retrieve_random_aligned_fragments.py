@@ -19,11 +19,9 @@ def retrieve_random_aligned_fragments(aligned_fragments_mat,
     if n_spectra < 1:
         raise ValueError("aligned_fragments_mat must contain at least one spectrum column after the m/z column.")
 
-    current_sampling_size = min(int(current_sampling_size),
-                                n_spectra)
+    current_sampling_size = min(int(current_sampling_size), n_spectra)
 
-    current_sampling_size = max(current_sampling_size,
-                                1)
+    current_sampling_size = max(current_sampling_size, 1)
 
     sampled_spectrum_ids = rng.choice(np.arange(n_spectra),
                                       size = current_sampling_size,
@@ -41,6 +39,3 @@ def retrieve_random_aligned_fragments(aligned_fragments_mat,
     return [cosine_matrix,
             current_sample_aligned_fragments_mat,
             sampled_spectrum_ids]
-
-
-# In[5]:
