@@ -3,7 +3,6 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 from sklearn.mixture import GaussianMixture
-
 def search_neutral_loss_gmm_components(mz_vec,
                                        min_components=1,
                                        max_components=100,

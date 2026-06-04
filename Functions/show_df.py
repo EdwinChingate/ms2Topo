@@ -4,8 +4,7 @@ from IPython.display import HTML, display
 import pandas as pd
 import tabulate
 
-def show_df(context,
-            params):
+def show_df(context):
     """
     Display a dataframe or array as HTML.
 
