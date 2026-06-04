@@ -1,12 +1,12 @@
 import numpy as np
-from LowSignalClustering import *
+from low_signal_clustering import *
 from DistanceDistribution import *
 from ResolvingChromatogram import *
 def Feat_RT_edges(Chromatogram,minSpec=10,stdDistance=3,int_col=5,NoiseCluster=False):    
     if NoiseCluster:
-        NoiseTresVec=LowSignalClustering(SignalVec0=Chromatogram[:,int_col])[0]
+        NoiseTresVec=low_signal_clustering(SignalVec0=Chromatogram[:,int_col])[0]
     else:
-        Module=LowSignalClustering(SignalVec0=Chromatogram[:,int_col])[1]
+        Module=low_signal_clustering(SignalVec0=Chromatogram[:,int_col])[1]
         NoiseTresVec=DistanceDistribution(SignalVec0=Chromatogram[Module,int_col])
     NoiseTres=NoiseTresVec[0]+NoiseTresVec[1]*stdDistance
     #print(NoiseTres)

@@ -1,6 +1,6 @@
-from scipy import integrate	
+from scipy import integrate 
 import numpy as np
-def GaussBoundaries(smooth_peaks,minValue=1e-5):
+def gauss_boundaries(smooth_peaks,minValue=1e-5):
     RT_vec=smooth_peaks[:,0]
     Int_vec=smooth_peaks[:,1]
     RT_max=np.max(RT_vec)

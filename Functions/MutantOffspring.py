@@ -13,6 +13,6 @@ def MutantOffspring(ParametersMat,boundsMat,stdDistance,Mutants=4,mut_stdVec=[0.
             ParametersVec=ParametersMat[:,parameter_id]
             MutationTensor[:,:,parameter_id]=MutateParameters(ParametersVec=ParametersVec,boundsVec=boundsVec,parameter_std=mut_std,Mutants=Mutants)
     except:
-        ShowDF(boundsMatRef)
+        show_df(boundsMatRef)
     MutantPopulation=MutantansExtractor(MutationTensor=MutationTensor,Mutants=Mutants)
     return MutantPopulation

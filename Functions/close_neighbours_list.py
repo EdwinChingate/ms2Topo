@@ -1,5 +1,5 @@
 import numpy as np
-def CloseNeighboursList(SignalVec,minSignal=0):
+def close_neighbours_list(SignalVec,minSignal=0):
     if minSignal==0:
         minSignal=np.min(SignalVec)
     NeighboursList=[]

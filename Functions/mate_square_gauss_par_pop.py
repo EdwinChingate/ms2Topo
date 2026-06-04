@@ -1,5 +1,5 @@
 import numpy as np
-def Mate_square_GaussParPop(SeedPopulation):
+def mate_square_gauss_par_pop(SeedPopulation):
     NSeedIndividuals=len(SeedPopulation)
     NPeaks=len(SeedPopulation[0])
     Population=[]

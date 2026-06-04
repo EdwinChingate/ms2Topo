@@ -11,7 +11,7 @@ def EvaluatingCombinationsFromVec(SChrom,ParametersMat):
     r2List=[]
     for SelectorVector in SelectorVectorList:
         Int_model=np.matmul(ChromatogramMatrix,SelectorVector)
-        r2=r2_Model(RawSignal=Int_vec,ModelSignal=Int_model)
+        r2=r2_model(RawSignal=Int_vec,ModelSignal=Int_model)
         r2List.append(r2)
     r2Vec=np.array(r2List,dtype='f2')
     FitSelectorVectorList,r2ListFit=FitnessSelectorVector(r2Vec=r2Vec,SelectorVectorList=SelectorVectorList,NSelect=5)

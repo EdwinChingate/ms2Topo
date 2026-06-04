@@ -1,8 +1,8 @@
 from scipy.signal import find_peaks
 import numpy as np
-from OverlappingGaussPeaks import *
+from overlapping_gauss_peaks import *
 def SplitParametersMat(RT_vec,ParametersMat,TresholdList,prominence=1,distance=5,stdDistance=3):
-    ChromatogramMatrix=OverlappingGaussPeaks(RT_vec=RT_vec,ParametersMat=ParametersMat,stdDistance=2*stdDistance)
+    ChromatogramMatrix=overlapping_gauss_peaks(RT_vec=RT_vec,ParametersMat=ParametersMat,stdDistance=2*stdDistance)
     GaussFitSignal=sum(ChromatogramMatrix.T)
     peaksMin=find_peaks(-GaussFitSignal,prominence=prominence,distance=distance)[0]
     TresholdList=TresholdList+list(RT_vec[peaksMin])

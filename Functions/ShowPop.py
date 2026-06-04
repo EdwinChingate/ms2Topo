@@ -1,4 +1,4 @@
-from ShowDF import *
+from show_df import *
 def ShowPop(Population):
     for individual in Population:
-        ShowDF(individual)
+        show_df(individual)

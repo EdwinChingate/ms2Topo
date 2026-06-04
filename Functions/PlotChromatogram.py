@@ -1,7 +1,7 @@
 from MaxIntChromatogram import *
 from Feat_RT_edges import *
 from BaseLine import *
-from ShowDF import *
+from show_df import *
 import matplotlib.pyplot as plt
 def PlotChromatogram(mz,mz_std,DataSet,DataSetName,MS1IDVec,AllPeaks,minIntFrac=1,int_col=1,RT_col=2,BaseLinePoints_2=3,LogFileName='LogFile_ms1.csv',stdDistance=1,minSignals=5,MaxCount=3,minInt=1e3,Points_for_regression=4,alpha=0.01,minSpec=10,minWindow=11,minPoly=5):
     Chromatogram=MaxIntChromatogram(mz=mz,mz_std=mz_std,AllPeaks=AllPeaks,stdDistance=stdDistance)    
@@ -9,7 +9,7 @@ def PlotChromatogram(mz,mz_std,DataSet,DataSetName,MS1IDVec,AllPeaks,minIntFrac=
     ChrMat=Feat_RT_edges(Chromatogram=Chromatogram,minSpec=minSpec,int_col=int_col,stdDistance=3,NoiseCluster=False)
     plt.plot(Chromatogram[:,2],Chromatogram[:,1],'.')
     plt.show()
-    ShowDF(ChrMat)
+    show_df(ChrMat)
     if len(ChrMat)==0:
         return []
     min_mz=mz-mz_std*stdDistance

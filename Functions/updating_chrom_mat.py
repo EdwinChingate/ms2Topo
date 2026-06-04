@@ -1,5 +1,5 @@
 import numpy as np
-def UpdatingChromMat(ChromatogramMatrix,ContributionsVec):
+def updating_chrom_mat(ChromatogramMatrix,ContributionsVec):
     Updated_ChromatogramMatrix=ChromatogramMatrix.copy()
     NContributions=len(ContributionsVec)
     for peak_id in np.arange(NContributions,dtype='int'):

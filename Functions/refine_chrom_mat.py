@@ -1,5 +1,5 @@
 import numpy as np
-def RefineChromMat(ChromatogramMatrix,Chromatogram,ParametersMat,int_col=1,RT_col=0,stdDistance=3,ConstrainPeaks=True):
+def refine_chrom_mat(ChromatogramMatrix,Chromatogram,ParametersMat,int_col=1,RT_col=0,stdDistance=3,ConstrainPeaks=True):
     IntVec=Chromatogram[:,int_col]
     RT_vec=Chromatogram[:,RT_col]
     ChromatogramMatrix_Adj=ChromatogramMatrix.copy()

@@ -1,5 +1,5 @@
 import numpy as np
-def BiggestSelector(r2,r2Vec,Population,lower_std=1e-2):
+def biggest_selector(r2,r2Vec,Population,lower_std=1e-2):
     BiggestPeakList=[]
     LevelLineVec=np.where(r2Vec==r2)[0]
     if len(LevelLineVec)==1:

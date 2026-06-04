@@ -1,8 +1,8 @@
 import numpy as np
-from LowSignalClustering import *
-def CuttingFreq(fft_signal,frequencies,stdDistance=1,MinSignalFraction=0.5):
+from low_signal_clustering import *
+def cutting_freq(fft_signal,frequencies,stdDistance=1,MinSignalFraction=0.5):
     NSig=len(fft_signal)
-    NoiseTresVec=LowSignalClustering(SignalVec0=np.abs(fft_signal))[0]
+    NoiseTresVec=low_signal_clustering(SignalVec0=np.abs(fft_signal))[0]
     NoiseTres=NoiseTresVec[2]    
     NoiseLoc=fft_signal<=NoiseTres
     NoiseFreq=frequencies[NoiseLoc]

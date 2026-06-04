@@ -1,12 +1,12 @@
-from CloseNeighboursList import *
+from close_neighbours_list import *
 from ms2_feat_modules import *
-from SignalsModulesStats import *
-def LowSignalClustering(SignalVec0,minSignal=0):
+from signals_modules_stats import *
+def low_signal_clustering(SignalVec0,minSignal=0):
     ZeroFil=SignalVec0>0
     SignalVec=SignalVec0[ZeroFil]    
-    NeighboursList,SignalsSet=CloseNeighboursList(SignalVec,minSignal=minSignal)
+    NeighboursList,SignalsSet=close_neighbours_list(SignalVec,minSignal=minSignal)
     Modules=ms2_feat_modules(AdjacencyList=NeighboursList,ms2_ids=SignalsSet)
-    ModulesStats=SignalsModulesStats(Modules,SignalVec)
+    ModulesStats=signals_modules_stats(Modules,SignalVec)
     NoiseTresVec=ModulesStats[0,:]
     modLoc=int(NoiseTresVec[-1])
     Module=Modules[modLoc]

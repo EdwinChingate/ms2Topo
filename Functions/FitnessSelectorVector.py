@@ -1,5 +1,5 @@
 import numpy as np
-from BiggestSelector import *
+from biggest_selector import *
 def FitnessSelectorVector(r2Vec,SelectorVectorList,NSelect=0):
     if NSelect==0:
         NSelect=len(SelectorVectorList)

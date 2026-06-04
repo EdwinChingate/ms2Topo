@@ -1,5 +1,5 @@
 import numpy as np
-def WeightGauss(RT_vec,Int_vec,RT=0):  
+def weight_gauss(RT_vec,Int_vec,RT=0):  
     minInt=np.min(Int_vec)
     if minInt<0:
         Int_vec=Int_vec.copy()-minInt

@@ -1,5 +1,5 @@
 import numpy as np
-def AdjustingPeaksContributions(smooth_peaks,ChromatogramMatrix):
+def adjusting_peaks_contributions(smooth_peaks,ChromatogramMatrix):
     IntVec=smooth_peaks[:,1]
     NPeaks=len(ChromatogramMatrix[0,:])
     ChromatogramMatrixTranspose=ChromatogramMatrix.T

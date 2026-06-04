@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import interp1d
-def RedistributeSampling(PeakChr,N_new=0,RT_col=2,int_col=1):    
+def redistribute_sampling(PeakChr,N_new=0,RT_col=2,int_col=1):    
     N_signals=len(PeakChr[:,RT_col])
     if N_new==0:
         N_new=2**int(np.ceil(np.log(N_signals)/np.log(2)))

@@ -1,6 +1,6 @@
 import numpy as np
-from WeightGauss import *
-def ParametersFitGaussParallelPeaks(RT_vec,ChromatogramMatrix,boundsMat,ParametersMat,stdDistance=3):
+from weight_gauss import *
+def parameters_fit_gauss_parallel_peaks(RT_vec,ChromatogramMatrix,boundsMat,ParametersMat,stdDistance=3):
     NPeaks=int(len(ParametersMat[:,0]))
     Integral=boundsMat[2,1]
     GaussianPopulation=[]
@@ -8,7 +8,7 @@ def ParametersFitGaussParallelPeaks(RT_vec,ChromatogramMatrix,boundsMat,Paramete
         ParametersMat_peak=ParametersMat.copy()
         Int_vec=ChromatogramMatrix[:,peak_id] 
         RT=ParametersMat[peak_id,0]        
-        GaussianParameters=WeightGauss(RT_vec=RT_vec,Int_vec=Int_vec,RT=RT)        
+        GaussianParameters=weight_gauss(RT_vec=RT_vec,Int_vec=Int_vec,RT=RT)        
         ParametersMat_peak[peak_id,:]=np.array(GaussianParameters)
         ParametersMat_peak=ParametersMat_peak[ParametersMat_peak[:,0].argsort(),:]
         GaussianIntegral=np.sum(ParametersMat_peak[:,2])

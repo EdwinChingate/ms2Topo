@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-from ShowDF import *
+from show_df import *
 from adjacent_neutral_losses import *
 
 def fragments_sampling(mz_vec,
@@ -20,7 +20,7 @@ def fragments_sampling(mz_vec,
 
     neutral_losses_adjacency_matrix = adjacent_neutral_losses(neutral_losses_array = mz_vec[sampled_fragment_ids],
                                                               mz_tol = 1e-4)
-    ShowDF(neutral_losses_adjacency_matrix)
+    show_df(neutral_losses_adjacency_matrix)
     G = nx.from_numpy_array(neutral_losses_adjacency_matrix)
 
 

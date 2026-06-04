@@ -1,7 +1,7 @@
 from IPython.display import HTML, display
-import tabulate	
+import tabulate 
 import pandas as pd
-def ShowDF(DF,col=''):
+def show_df(DF,col=''):
     if type(DF)!=type(pd.DataFrame()):
         DF=pd.DataFrame(DF)
     if col=='':

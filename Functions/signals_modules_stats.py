@@ -1,5 +1,5 @@
 import numpy as np
-def SignalsModulesStats(Modules,SignalVec):
+def signals_modules_stats(Modules,SignalVec):
     ModulesStats=[]
     modLoc=0
     for module in Modules:

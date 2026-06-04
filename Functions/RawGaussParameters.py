@@ -1,5 +1,5 @@
 import numpy as np
-from UmbrellasStats import *
+from umbrellas_stats import *
 from RefineParameters import *
 def RawGaussParameters(smooth_peaks,peaksMax,boundsMat,minContribution=2):
     NPeaks=len(peaksMax)
@@ -11,7 +11,7 @@ def RawGaussParameters(smooth_peaks,peaksMax,boundsMat,minContribution=2):
     PeaksUmbrellaMat[1:,1]=PeakValley
     PeaksUmbrellaMat[:-1,2]=PeakValley
     PeaksUmbrellaMat[-1,2]=NSignals
-    PeaksUmbrellaMat=UmbrellasStats(smooth_peaks=smooth_peaks,PeaksUmbrellaMat=PeaksUmbrellaMat,NPeaks=NPeaks)
+    PeaksUmbrellaMat=umbrellas_stats(smooth_peaks=smooth_peaks,PeaksUmbrellaMat=PeaksUmbrellaMat,NPeaks=NPeaks)
     PeaksUmbrellaMat=PeaksUmbrellaMat[PeaksUmbrellaMat[:,6].argsort(),:]
     ParametersMat=PeaksUmbrellaMat[:,4:]
     ParametersMat=RefineParameters(ParametersList=ParametersMat,smooth_peaks=smooth_peaks,boundsMat=boundsMat,minContribution=minContribution)
