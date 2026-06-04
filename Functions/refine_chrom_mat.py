@@ -1,23 +1,53 @@
+from __future__ import annotations
+
 import numpy as np
-def refine_chrom_mat(ChromatogramMatrix,Chromatogram,ParametersMat,int_col=1,RT_col=0,stdDistance=3,ConstrainPeaks=True):
-    IntVec=Chromatogram[:,int_col]
-    RT_vec=Chromatogram[:,RT_col]
-    ChromatogramMatrix_Adj=ChromatogramMatrix.copy()
-    Shape=np.shape(ChromatogramMatrix_Adj)
-    Refined_ChromatogramMatrix=np.zeros(Shape)
-    NContributions=len(ChromatogramMatrix[0,:])
-    SumSubstractVec=np.ones(NContributions)
-    RTLoc=np.arange(len(RT_vec))
-    ContributionsOrder=ParametersMat[:,2].argsort()
-    for peak_id in ContributionsOrder:
-        if ConstrainPeaks:
-            RT,RT_std=ParametersMat[peak_id,:2]
-            min_RT=RT-stdDistance*RT_std
-            max_RT=RT+stdDistance*RT_std
-            RTLoc=(RT_vec>min_RT)&(RT_vec<max_RT)
-        SumSubstractVec[peak_id]=0
-        Others_int_Contribution=np.matmul(ChromatogramMatrix_Adj[RTLoc,:],SumSubstractVec)
-        SumSubstractVec[peak_id]=1
-        Refin_int_Contribution=IntVec[RTLoc]-Others_int_Contribution
-        ChromatogramMatrix_Adj[RTLoc,peak_id]=Refin_int_Contribution
-    return ChromatogramMatrix_Adj
+
+def refine_chrom_mat(context,
+                     params):
+    """
+    Re-estimate each peak contribution after subtracting other fitted peaks.
+
+    Expected context keys:
+        chromatogram_matrix, chromatogram, parameters_mat
+
+    Relevant params:
+        params["columns"]["int_col"]
+        params["columns"]["rt_col"]
+        params["gaussian"]["std_distance"]
+        params["gaussian"]["constrain_peaks"]
+    """
+
+    chromatogram_matrix = context["chromatogram_matrix"]
+    chromatogram = context["chromatogram"]
+    parameters_mat = context["parameters_mat"]
+
+    int_col = params["columns"]["int_col"]
+    rt_col = params["columns"]["rt_col"]
+    std_distance = params["gaussian"]["std_distance"]
+    constrain_peaks = params["gaussian"]["constrain_peaks"]
+
+    int_vec = chromatogram[:, int_col]
+    rt_vec = chromatogram[:, rt_col]
+
+    chromatogram_matrix_adjusted = chromatogram_matrix.copy()
+    n_contributions = len(chromatogram_matrix[0, :])
+    sum_subtract_vec = np.ones(n_contributions)
+    rt_location = np.arange(len(rt_vec))
+    contributions_order = parameters_mat[:, 2].argsort()
+
+    for peak_id in contributions_order:
+        if constrain_peaks:
+            rt, rt_std = parameters_mat[peak_id, :2]
+            min_rt = rt - std_distance * rt_std
+            max_rt = rt + std_distance * rt_std
+            rt_location = (rt_vec > min_rt) & (rt_vec < max_rt)
+
+        sum_subtract_vec[peak_id] = 0
+        other_intensity_contribution = np.matmul(chromatogram_matrix_adjusted[rt_location, :],
+                                                 sum_subtract_vec)
+
+        sum_subtract_vec[peak_id] = 1
+        refined_intensity_contribution = int_vec[rt_location] - other_intensity_contribution
+        chromatogram_matrix_adjusted[rt_location, peak_id] = refined_intensity_contribution
+
+    return chromatogram_matrix_adjusted

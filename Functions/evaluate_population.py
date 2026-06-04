@@ -1,15 +1,46 @@
+from __future__ import annotations
+
 import numpy as np
-from r2_model import *
 from overlapping_gauss_peaks import *
-def evaluate_population(Population,smooth_peaks):
-    NIndividuals=len(Population)
-    RT_vec=smooth_peaks[:,0]
-    Int_vec=smooth_peaks[:,1]
-    r2List=[]
-    for individual in np.arange(NIndividuals, dtype='int'):
-        ChromatogramMatrix=overlapping_gauss_peaks(RT_vec=RT_vec,ParametersMat=Population[individual])
-        Int_model=sum(ChromatogramMatrix.T)
-        r2=r2_model(RawSignal=Int_vec,ModelSignal=Int_model)
-        r2List.append(r2)
-    r2Vec=np.array(r2List,dtype='f2')
-    return r2Vec
+from r2_model import *
+
+def evaluate_population(context,
+                        params):
+    """
+    Evaluate every Gaussian parameter matrix against a smoothed chromatogram.
+
+    Expected context keys:
+        population, smooth_peaks
+    """
+
+    population = context["population"]
+    smooth_peaks = context["smooth_peaks"]
+
+    n_individuals = len(population)
+    rt_vec = smooth_peaks[:, 0]
+    int_vec = smooth_peaks[:, 1]
+    r2_list = []
+
+    for individual in np.arange(n_individuals,
+                                dtype = int):
+        overlap_context = {"rt_vec": rt_vec,
+                           "parameters_mat": population[individual]}
+
+        chromatogram_matrix = overlapping_gauss_peaks(context = overlap_context,
+                                                      params = params)
+
+        intensity_model = np.sum(chromatogram_matrix.T,
+                                 axis = 0)
+
+        r2_context = {"raw_signal": int_vec,
+                      "model_signal": intensity_model}
+
+        r2 = r2_model(context = r2_context,
+                      params = params)
+
+        r2_list.append(r2)
+
+    r2_vec = np.array(r2_list,
+                      dtype = np.float32)
+
+    return r2_vec

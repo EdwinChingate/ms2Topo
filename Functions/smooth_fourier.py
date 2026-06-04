@@ -1,28 +1,88 @@
+from __future__ import annotations
+
 import numpy as np
 from cutting_freq import *
 from redistribute_sampling import *
-def smooth_fourier(PeakChr,stdDistance=1,RT_col=2,int_col=1,SuggestSavgolWindow=False,SavgolWindowTimes=2,MaxSignals=50):
-    N_signals=len(PeakChr[:,RT_col])
-    RedisPeak=redistribute_sampling(PeakChr=PeakChr,RT_col=RT_col,int_col=int_col)
-    time=RedisPeak[:,0]
-    signal=RedisPeak[:,1]
-    NSig=len(signal)
-    min_RT=np.min(time)
-    max_RT=np.max(time)
-    RT_total=max_RT-min_RT
-    SamplingRate=N_signals/RT_total
-    fft_signal=np.fft.fft(signal)
-    frequencies = np.fft.fftfreq(NSig,d=(time[1] - time[0]))    
-    FreqTres=cutting_freq(fft_signal=fft_signal,frequencies=frequencies,stdDistance=stdDistance,MinSignalFraction=0.5)
-    fft_filtered=fft_signal.copy()
-    fft_filtered[np.abs(frequencies)>FreqTres] = 0
+
+def smooth_fourier(context,
+                   params):
+    """
+    Smooth a chromatogram by removing high Fourier frequencies.
+
+    Expected context keys:
+        peak_chromatogram, suggest_savgol_window
+
+    Relevant params:
+        params["columns"]["rt_col"]
+        params["columns"]["int_col"]
+        params["smoothing"]["std_distance"]
+        params["smoothing"]["savgol_window_times"]
+        params["smoothing"]["max_signals"]
+    """
+
+    peak_chromatogram = context["peak_chromatogram"]
+    suggest_savgol_window = context["suggest_savgol_window"]
+
+    rt_col = params["columns"]["rt_col"]
+    int_col = params["columns"]["int_col"]
+    std_distance = params["smoothing"]["std_distance"]
+    savgol_window_times = params["smoothing"]["savgol_window_times"]
+    max_signals = params["smoothing"]["max_signals"]
+
+    n_signals = len(peak_chromatogram[:, rt_col])
+
+    redistribution_context = {"peak_chromatogram": peak_chromatogram,
+                              "n_new": n_signals}
+
+    redistributed_peak = redistribute_sampling(context = redistribution_context,
+                                               params = params)
+
+    time = redistributed_peak[:, 0]
+    signal = redistributed_peak[:, 1]
+    n_fft_signals = len(signal)
+
+    min_rt = np.min(time)
+    max_rt = np.max(time)
+    rt_total = max_rt - min_rt
+    sampling_rate = n_signals / rt_total
+
+    fft_signal = np.fft.fft(signal)
+    frequencies = np.fft.fftfreq(n_fft_signals,
+                                 d = (time[1] - time[0]))
+
+    cutting_context = {"fft_signal": fft_signal,
+                       "frequencies": frequencies}
+
+    frequency_threshold = cutting_freq(context = cutting_context,
+                                       params = params)
+
+    fft_filtered = fft_signal.copy()
+    fft_filtered[np.abs(frequencies) > frequency_threshold] = 0
+
     filtered_signal = np.fft.ifft(fft_filtered).real
-    smooth_fourier=RedisPeak.copy()
-    smooth_fourier[:,1]=np.abs(filtered_signal)  
-    N_signals=np.min([N_signals,MaxSignals])
-    smooth_fourier=redistribute_sampling(PeakChr=smooth_fourier,N_new=N_signals,RT_col=0,int_col=1)
-    if SuggestSavgolWindow:
-        SavgolWindow=SamplingRate/FreqTres*SavgolWindowTimes
-        SavgolWindow_odd=int(SavgolWindow/2)*2+1
-        return [smooth_fourier,SavgolWindow_odd]
-    return smooth_fourier
+    smooth_fourier_chromatogram = redistributed_peak.copy()
+    smooth_fourier_chromatogram[:, 1] = np.abs(filtered_signal)
+
+    n_signals = np.min([n_signals,
+                        max_signals])
+
+    redistribution_context = {"peak_chromatogram": smooth_fourier_chromatogram,
+                              "n_new": n_signals}
+
+    # redistributed_peak has rt/int columns at 0 and 1 after Fourier smoothing.
+    local_params = params.copy()
+    local_params["columns"] = params["columns"].copy()
+    local_params["columns"]["rt_col"] = 0
+    local_params["columns"]["int_col"] = 1
+
+    smooth_fourier_chromatogram = redistribute_sampling(context = redistribution_context,
+                                                        params = local_params)
+
+    if suggest_savgol_window:
+        savgol_window = sampling_rate / frequency_threshold * savgol_window_times
+        savgol_window_odd = int(savgol_window / 2) * 2 + 1
+
+        return [smooth_fourier_chromatogram,
+                savgol_window_odd]
+
+    return smooth_fourier_chromatogram

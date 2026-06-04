@@ -1,12 +1,45 @@
+from __future__ import annotations
+
+import numpy as np
 from weight_gauss import *
-def umbrellas_stats(smooth_peaks,PeaksUmbrellaMat,NPeaks,RT_col=0,int_col=1,Points_for_regression=4):
-    for pseudo_peak_id in np.arange(NPeaks,dtype='int'):
-        EarlyLoc=int(PeaksUmbrellaMat[pseudo_peak_id,1])
-        LateLoc=int(PeaksUmbrellaMat[pseudo_peak_id,2])
-        MaxRTLoc=int(PeaksUmbrellaMat[pseudo_peak_id,0])   
-        RT=smooth_peaks[MaxRTLoc,RT_col]
-        RT_vec=smooth_peaks[EarlyLoc:LateLoc,RT_col]
-        Int_vec=smooth_peaks[EarlyLoc:LateLoc,int_col]
-        Stats=weight_gauss(RT_vec=RT_vec,Int_vec=Int_vec,RT=RT)
-        PeaksUmbrellaMat[pseudo_peak_id,3:]=Stats
-    return PeaksUmbrellaMat
+
+def umbrellas_stats(context,
+                    params):
+    """
+    Estimate initial Gaussian parameters for peak umbrellas.
+
+    Expected context keys:
+        smooth_peaks, peaks_umbrella_mat, n_peaks
+
+    Relevant params:
+        params["columns"]["rt_col"]
+        params["columns"]["int_col"]
+    """
+
+    smooth_peaks = context["smooth_peaks"]
+    peaks_umbrella_mat = context["peaks_umbrella_mat"]
+    n_peaks = context["n_peaks"]
+
+    rt_col = params["columns"]["rt_col"]
+    int_col = params["columns"]["int_col"]
+
+    for pseudo_peak_id in np.arange(n_peaks,
+                                    dtype = int):
+        early_location = int(peaks_umbrella_mat[pseudo_peak_id, 1])
+        late_location = int(peaks_umbrella_mat[pseudo_peak_id, 2])
+        max_rt_location = int(peaks_umbrella_mat[pseudo_peak_id, 0])
+
+        rt = smooth_peaks[max_rt_location, rt_col]
+        rt_vec = smooth_peaks[early_location: late_location, rt_col]
+        int_vec = smooth_peaks[early_location: late_location, int_col]
+
+        weight_context = {"rt_vec": rt_vec,
+                          "int_vec": int_vec,
+                          "rt": rt}
+
+        stats = weight_gauss(context = weight_context,
+                             params = params)
+
+        peaks_umbrella_mat[pseudo_peak_id, 3:] = stats
+
+    return peaks_umbrella_mat

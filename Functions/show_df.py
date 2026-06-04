@@ -1,9 +1,24 @@
+from __future__ import annotations
+
 from IPython.display import HTML, display
-import tabulate 
 import pandas as pd
-def show_df(DF,col=''):
-    if type(DF)!=type(pd.DataFrame()):
-        DF=pd.DataFrame(DF)
-    if col=='':
-        col=list(DF.columns)
-    display(HTML(tabulate.tabulate(DF[col], headers= col,tablefmt='html')))    
+import tabulate
+
+def show_df(context,
+            params):
+    """
+    Display a dataframe or array as HTML.
+
+    Expected context keys:
+        df, columns
+    """
+
+    df = context["df"]
+    columns = context["columns"]
+
+    if type(df) != type(pd.DataFrame()):
+        df = pd.DataFrame(df)
+
+    display(HTML(tabulate.tabulate(df[columns],
+                                   headers = columns,
+                                   tablefmt = "html")))

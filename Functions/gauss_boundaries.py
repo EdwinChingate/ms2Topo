@@ -1,12 +1,37 @@
-from scipy import integrate 
+from __future__ import annotations
+
 import numpy as np
-def gauss_boundaries(smooth_peaks,minValue=1e-5):
-    RT_vec=smooth_peaks[:,0]
-    Int_vec=smooth_peaks[:,1]
-    RT_max=np.max(RT_vec)
-    RT_min=np.min(RT_vec)
-    RT_maxDif=RT_max-RT_min    
-    Integral=integrate.simpson(y=Int_vec,x=RT_vec)
-    boundsList=[[RT_min,RT_max,RT_maxDif],[minValue,RT_maxDif,RT_maxDif/6],[minValue,Integral,Integral/2]]
-    boundsMat=np.array(boundsList)
-    return boundsMat
+from scipy import integrate
+
+def gauss_boundaries(context,
+                     params):
+    """
+    Build curve-fit bounds for Gaussian parameters.
+
+    Expected context keys:
+        smooth_peaks
+
+    Relevant params:
+        params["gaussian"]["min_value"]
+    """
+
+    smooth_peaks = context["smooth_peaks"]
+    min_value = params["gaussian"]["min_value"]
+
+    rt_vec = smooth_peaks[:, 0]
+    int_vec = smooth_peaks[:, 1]
+
+    rt_max = np.max(rt_vec)
+    rt_min = np.min(rt_vec)
+    rt_max_difference = rt_max - rt_min
+
+    integral = integrate.simpson(y = int_vec,
+                                 x = rt_vec)
+
+    bounds_list = [[rt_min, rt_max, rt_max_difference],
+                   [min_value, rt_max_difference, rt_max_difference / 6],
+                   [min_value, integral, integral / 2]]
+
+    bounds_mat = np.array(bounds_list)
+
+    return bounds_mat
