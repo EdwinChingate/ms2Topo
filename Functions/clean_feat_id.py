@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
+import os
+import re
+import numpy as np
 import pandas as pd
+from scipy.sparse import coo_matrix, csr_matrix
 
 def clean_feat_id(feat_id):
     """

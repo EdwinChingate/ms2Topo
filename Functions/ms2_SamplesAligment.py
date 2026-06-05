@@ -16,14 +16,14 @@ def ms2_SamplesAligment(context,
 
     ProjectName = context["ProjectName"]
     All_SummMS2Table = context["All_SummMS2Table"]
-    EdgesMat = context["EdgesMat"]
+    edges_matrix = context["EdgesMat"]
     SamplesNames = context["SamplesNames"]
     feature_id = context.get("feature_id", 0)
 
     aligned_samples_dfs = []
 
-    for Low_id_mz, High_id_mz, slice_id in EdgesMat:
-        SummMS2_raw = All_SummMS2Table[Low_id_mz: High_id_mz, :]
+    for low_id_mz, high_id_mz, slice_id in edges_matrix:
+        SummMS2_raw = All_SummMS2Table[low_id_mz: high_id_mz, :]
 
         slice_context = {"SummMS2_raw": SummMS2_raw,
                          "SamplesNames": SamplesNames,
