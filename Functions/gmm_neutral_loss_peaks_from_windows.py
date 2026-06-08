@@ -3,9 +3,11 @@ from __future__ import annotations
 import numpy as np
 from gmm_variances_1d import *
 from search_neutral_loss_gmm_components import *
+
 def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                                         mz_windows,
-                                        target_component_iqr_da,
+                                        target_component_iqr_da = 1e-3,
+                                        target_component_iqr_ppm = 3,
                                         min_counts = 3,
                                         min_points_per_component = 5,
                                         max_components_cap = 10,
@@ -13,9 +15,21 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                                         reg_covar = (1e-5)**2,
                                         max_iter = 1000,
                                         random_state = 7,
-                                        std_distance = 3):
+                                        std_distance = 3,
+                                        skip_gmm_for_tolerable_iqr = True):
     """
     Refine mz windows with local GMMs and return an extended mz-object table.
+
+    Windows whose IQR is already tolerable are directly collapsed as one
+    component when skip_gmm_for_tolerable_iqr = True.
+
+    The tolerable IQR is calculated as:
+
+        max(target_component_iqr_da,
+            target_component_iqr_ppm / 1e6 * median_mz)
+
+    This treats target_component_iqr_da as the low-mass absolute floor, and
+    target_component_iqr_ppm as the high-mass scaling rule.
 
     Output:
         neutral_loss_gmm_peaks[:, 0]  = median mz
@@ -28,8 +42,8 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
         neutral_loss_gmm_peaks[:, 6]  = Gaussian mz, Da
         neutral_loss_gmm_peaks[:, 7]  = Gaussian std, Da
         neutral_loss_gmm_peaks[:, 8]  = Gaussian std, ppm
-        neutral_loss_gmm_peaks[:, 9]  = Gaussian min mz, mean - std_distance * std
-        neutral_loss_gmm_peaks[:, 10] = Gaussian max mz, mean + std_distance * std
+        neutral_loss_gmm_peaks[:, 9]  = Gaussian min mz
+        neutral_loss_gmm_peaks[:, 10] = Gaussian max mz
 
         neutral_loss_gmm_peaks[:, 11] = component weight
         neutral_loss_gmm_peaks[:, 12] = expected count
@@ -42,13 +56,25 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
         neutral_loss_gmm_peaks[:, 18] = delta BIC vs one-component model
     """
 
+    if target_component_iqr_da <= 0:
+        raise ValueError("target_component_iqr_da must be > 0")
+
+    if target_component_iqr_ppm <= 0:
+        raise ValueError("target_component_iqr_ppm must be > 0")
+
+    neutral_losses_array = np.asarray(neutral_losses_array,
+                                      dtype = float)
+
+    mz_windows = np.asarray(mz_windows,
+                            dtype = float)
+
     rows = []
 
     for window_id, mz_window in enumerate(mz_windows):
 
         low_id_mz = int(mz_window[0])
         high_id_mz = int(mz_window[1])
-        iqr_mz_da = mz_window[2]
+        iqr_mz_da = float(mz_window[2])
 
         mz_vec = neutral_losses_array[low_id_mz: high_id_mz]
 
@@ -62,15 +88,70 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
         if n_points < min_counts:
             continue
 
-        if target_component_iqr_da <= 0:
-            raise ValueError("target_component_iqr_da must be > 0")
+        median_mz_window = np.median(mz_vec)
+
+        target_iqr_da = max(target_component_iqr_da,
+                            target_component_iqr_ppm / 1e6 * median_mz_window)
+
+        if skip_gmm_for_tolerable_iqr and iqr_mz_da <= target_iqr_da:
+
+            median_mz = median_mz_window
+
+            q1_mz = np.percentile(mz_vec,
+                                  25)
+
+            q3_mz = np.percentile(mz_vec,
+                                  75)
+
+            component_iqr_mz_da = q3_mz - q1_mz
+            component_iqr_mz_ppm = component_iqr_mz_da / median_mz * 1e6
+
+            gaussian_mz = np.mean(mz_vec)
+
+            if n_points > 1:
+                gaussian_std = np.std(mz_vec,
+                                      ddof = 1)
+
+            else:
+                gaussian_std = 0
+
+            gaussian_std = max(gaussian_std,
+                               np.sqrt(reg_covar))
+
+            gaussian_std_ppm = gaussian_std / gaussian_mz * 1e6
+
+            gaussian_min_mz = gaussian_mz - std_distance * gaussian_std
+            gaussian_max_mz = gaussian_mz + std_distance * gaussian_std
+
+            rows.append([median_mz,
+                         n_points,
+                         low_id_mz,
+                         high_id_mz,
+                         component_iqr_mz_da,
+                         component_iqr_mz_ppm,
+                         gaussian_mz,
+                         gaussian_std,
+                         gaussian_std_ppm,
+                         gaussian_min_mz,
+                         gaussian_max_mz,
+                         1.0,
+                         float(n_points),
+                         1.0,
+                         1.0,
+                         1,
+                         np.nan,
+                         np.nan,
+                         np.nan])
+
+            continue
 
         max_by_points = n_points // min_points_per_component
 
         if iqr_mz_da <= 0:
             max_by_iqr = 1
+
         else:
-            max_by_iqr = int(np.ceil(iqr_mz_da / target_component_iqr_da))
+            max_by_iqr = int(np.ceil(iqr_mz_da / target_iqr_da))
 
         max_components = min(max_by_points,
                              max_by_iqr,
@@ -111,10 +192,7 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
             if len(component_local_ids) < min_counts:
                 continue
 
-            component_start_idx = low_id_mz + int(np.min(component_local_ids))
-            component_stop_idx = low_id_mz + int(np.max(component_local_ids)) + 1
-
-            component_mz_vec = neutral_losses_array[component_start_idx: component_stop_idx]
+            component_mz_vec = mz_vec[component_local_ids]
 
             component_mz_vec = np.asarray(component_mz_vec,
                                           dtype = float)
@@ -123,6 +201,9 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
 
             if len(component_mz_vec) < min_counts:
                 continue
+
+            component_start_idx = low_id_mz + int(np.min(component_local_ids))
+            component_stop_idx = low_id_mz + int(np.max(component_local_ids)) + 1
 
             median_mz = np.median(component_mz_vec)
 

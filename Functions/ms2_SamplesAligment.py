@@ -9,13 +9,13 @@ def ms2_SamplesAligment(context,
     Run MS2 spectral-similarity clustering across all m/z slices.
 
     Expected context keys:
-        ProjectName, All_SummMS2Table, EdgesMat, SamplesNames
+        ProjectName, all_summ_ms2_table, EdgesMat, SamplesNames
     Optional context key:
         feature_id
     """
 
     ProjectName = context["ProjectName"]
-    All_SummMS2Table = context["All_SummMS2Table"]
+    all_summ_ms2_table = context["All_SummMS2Table"]
     edges_matrix = context["EdgesMat"]
     SamplesNames = context["SamplesNames"]
     feature_id = context.get("feature_id", 0)
@@ -23,9 +23,9 @@ def ms2_SamplesAligment(context,
     aligned_samples_dfs = []
 
     for low_id_mz, high_id_mz, slice_id in edges_matrix:
-        SummMS2_raw = All_SummMS2Table[low_id_mz: high_id_mz, :]
+        summ_ms2_raw = all_summ_ms2_table[low_id_mz: high_id_mz, :]
 
-        slice_context = {"SummMS2_raw": SummMS2_raw,
+        slice_context = {"SummMS2_raw": summ_ms2_raw,
                          "SamplesNames": SamplesNames,
                          "feature_id": feature_id,
                          "slice_id": slice_id}
