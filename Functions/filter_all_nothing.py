@@ -9,6 +9,11 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from draw_molecule_archetype_frontiers import *
 
-def compress_experiments_dist(bool_experiment_features_vec,
-                              joinS = '-'):
-    return joinS.join(bool_experiment_features_vec.astype(str).tolist())
+def filter_all_nothing(vec,
+                       experiments_df):
+    
+    if len(vec) == 0:
+        
+        return list(set(experiments_df['carbon source']))
+    
+    return vec
