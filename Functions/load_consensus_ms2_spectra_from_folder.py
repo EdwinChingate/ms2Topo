@@ -1,13 +1,36 @@
+# Extracted from notebook: 904937b2-026f-4f59-b3c0-21112b1589f8.ipynb
+# One function per file. Auto-generated from top-level function definitions.
 from __future__ import annotations
 
 from pathlib import Path
 import os
 import re
+import glob
+import sys
+
 import numpy as np
 import pandas as pd
 from scipy.sparse import coo_matrix, csr_matrix
-from get_consensus_spectrum_paths import *
-from read_consensus_ms2_spectrum import *
+
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+try:
+    import networkx as nx
+except Exception:
+    nx = None
+
+try:
+    from sklearn.mixture import GaussianMixture
+except Exception:
+    GaussianMixture = None
+
+# Local function dependencies extracted from the same notebook.
+from get_consensus_spectrum_paths import get_consensus_spectrum_paths
+from read_consensus_ms2_spectrum import read_consensus_ms2_spectrum
+
 
 def load_consensus_ms2_spectra_from_folder(consensus_spectra_folder,
                                            selected_feat_ids = None,
@@ -17,6 +40,7 @@ def load_consensus_ms2_spectra_from_folder(consensus_spectra_folder,
                                            mz_std_col = "IQR_mz(Da)",
                                            mz_iqr_ppm_col = "IQR_mz(ppm)",
                                            drop_nonpositive_intensity = True,
+                                           min_fragment_intensity = 0.0,
                                            normalization = "l2",
                                            continue_on_error = True):
     """
@@ -24,6 +48,10 @@ def load_consensus_ms2_spectra_from_folder(consensus_spectra_folder,
 
     This is the input-loading layer for the centroid-assignment pathway. It
     does not require a features table.
+
+    The returned summary_df now reports how many raw consensus fragments were
+    read, how many were removed by missing-value/intensity filters, and how
+    many positive-intensity fragments were passed to centroid assignment.
     """
 
     spectrum_rows = get_consensus_spectrum_paths(consensus_spectra_folder = consensus_spectra_folder,
@@ -49,19 +77,25 @@ def load_consensus_ms2_spectra_from_folder(consensus_spectra_folder,
                                                                 mz_std_col = mz_std_col,
                                                                 mz_iqr_ppm_col = mz_iqr_ppm_col,
                                                                 drop_nonpositive_intensity = drop_nonpositive_intensity,
+                                                                min_fragment_intensity = min_fragment_intensity,
                                                                 normalization = normalization)
 
+            filter_stats = consensus_spectrum_df.attrs.get("filter_stats", {})
+
+            summary_row = {"feat_id": feat_id,
+                           "spectrum_id": spectrum_id if len(consensus_spectrum_df) > 0 else np.nan,
+                           "status": "ok" if len(consensus_spectrum_df) > 0 else "empty_after_filter",
+                           "n_fragments": len(consensus_spectrum_df),
+                           "consensus_spectrum_file": str(consensus_spectrum_path),
+                           "error_message": ""}
+
+            summary_row.update(filter_stats)
+            summary_rows.append(summary_row)
+
             if len(consensus_spectrum_df) == 0:
-                raise ValueError("Consensus spectrum has no positive fragments after filtering.")
+                continue
 
             loaded_spectra.append(consensus_spectrum_df)
-
-            summary_rows.append({"feat_id": feat_id,
-                                 "spectrum_id": spectrum_id,
-                                 "status": "ok",
-                                 "n_fragments": len(consensus_spectrum_df),
-                                 "consensus_spectrum_file": str(consensus_spectrum_path),
-                                 "error_message": ""})
 
             feature_id_rows.append({"spectrum_id": spectrum_id,
                                     "feat_id": feat_id,

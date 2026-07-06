@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 from draw_molecule_archetype_frontiers import *
+from compress_experiments_dist import *
 
 def group_features_on_samples_distribution(experiment_features_df,
                                            threshold = 0.4,

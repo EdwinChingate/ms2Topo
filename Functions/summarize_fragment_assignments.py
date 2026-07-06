@@ -1,25 +1,48 @@
+# Extracted from notebook: 904937b2-026f-4f59-b3c0-21112b1589f8.ipynb
+# One function per file. Auto-generated from top-level function definitions.
 from __future__ import annotations
 
 from pathlib import Path
 import os
 import re
+import glob
+import sys
+
 import numpy as np
 import pandas as pd
 from scipy.sparse import coo_matrix, csr_matrix
+
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+try:
+    import networkx as nx
+except Exception:
+    nx = None
+
+try:
+    from sklearn.mixture import GaussianMixture
+except Exception:
+    GaussianMixture = None
+
 
 def summarize_fragment_assignments(fragment_assignment_df,
                                    feature_id_map_df):
     """
     Summarize assignment coverage per consensus spectrum.
 
-    assigned_fraction_int is the fraction of consensus-fragment intensity that
-    was assigned to any learned centroid.
+    assigned_fraction_int is the fraction of loaded positive-intensity
+    consensus-fragment intensity that was assigned to any learned centroid.
     """
 
     if fragment_assignment_df is None or len(fragment_assignment_df) == 0:
         return pd.DataFrame()
 
     summary_rows = []
+
+    score_col = "assignment_score" if "assignment_score" in fragment_assignment_df.columns else "assignment_posterior"
 
     for spectrum_id, spectrum_df in fragment_assignment_df.groupby("spectrum_id"):
 
@@ -29,6 +52,7 @@ def summarize_fragment_assignments(fragment_assignment_df,
         confident_filter = spectrum_df["assignment_status"] == 2
         ambiguous_filter = spectrum_df["assignment_status"] == 1
         unassigned_filter = spectrum_df["assignment_status"] == 0
+        no_candidate_filter = spectrum_df["n_candidate_fragments"] == 0
 
         assigned_intensity = spectrum_df.loc[assigned_filter, "fragment_intensity"].sum()
         confident_intensity = spectrum_df.loc[confident_filter, "fragment_intensity"].sum()
@@ -47,7 +71,7 @@ def summarize_fragment_assignments(fragment_assignment_df,
             ambiguous_fraction_int = np.nan
             unassigned_fraction_int = np.nan
 
-        assigned_posteriors = spectrum_df.loc[assigned_filter, "assignment_posterior"]
+        assigned_scores = spectrum_df.loc[assigned_filter, score_col]
 
         feat_id = feature_id_map_df.loc[feature_id_map_df["spectrum_id"] == spectrum_id,
                                         "feat_id"]
@@ -60,11 +84,14 @@ def summarize_fragment_assignments(fragment_assignment_df,
 
         summary_rows.append({"spectrum_id": int(spectrum_id),
                              "feat_id": feat_id,
+                             "n_loaded_positive_intensity_fragments": int(len(spectrum_df)),
                              "n_fragments": int(len(spectrum_df)),
                              "n_assigned_fragments": int(assigned_filter.sum()),
                              "n_confident_fragments": int(confident_filter.sum()),
                              "n_ambiguous_fragments": int(ambiguous_filter.sum()),
                              "n_unassigned_fragments": int(unassigned_filter.sum()),
+                             "n_no_candidate_fragments": int(no_candidate_filter.sum()),
+                             "all_positive_intensity_fragments_assigned": bool(unassigned_filter.sum() == 0),
                              "total_intensity": float(total_intensity),
                              "assigned_intensity": float(assigned_intensity),
                              "confident_intensity": float(confident_intensity),
@@ -74,8 +101,10 @@ def summarize_fragment_assignments(fragment_assignment_df,
                              "confident_fraction_int": float(confident_fraction_int),
                              "ambiguous_fraction_int": float(ambiguous_fraction_int),
                              "unassigned_fraction_int": float(unassigned_fraction_int),
-                             "mean_assignment_posterior": float(assigned_posteriors.mean()) if len(assigned_posteriors) > 0 else np.nan,
-                             "median_assignment_posterior": float(assigned_posteriors.median()) if len(assigned_posteriors) > 0 else np.nan,
+                             "mean_assignment_score": float(assigned_scores.mean()) if len(assigned_scores) > 0 else np.nan,
+                             "median_assignment_score": float(assigned_scores.median()) if len(assigned_scores) > 0 else np.nan,
+                             "mean_assignment_posterior": float(assigned_scores.mean()) if len(assigned_scores) > 0 else np.nan,
+                             "median_assignment_posterior": float(assigned_scores.median()) if len(assigned_scores) > 0 else np.nan,
                              "mean_n_candidate_fragments": float(spectrum_df["n_candidate_fragments"].mean())})
 
     assignment_summary_df = pd.DataFrame(summary_rows)

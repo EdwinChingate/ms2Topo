@@ -1,12 +1,35 @@
+# Extracted from notebook: 904937b2-026f-4f59-b3c0-21112b1589f8.ipynb
+# One function per file. Auto-generated from top-level function definitions.
 from __future__ import annotations
 
 from pathlib import Path
 import os
 import re
+import glob
+import sys
+
 import numpy as np
 import pandas as pd
 from scipy.sparse import coo_matrix, csr_matrix
-from column_to_array import *
+
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+try:
+    import networkx as nx
+except Exception:
+    nx = None
+
+try:
+    from sklearn.mixture import GaussianMixture
+except Exception:
+    GaussianMixture = None
+
+# Local function dependencies extracted from the same notebook.
+from column_to_array import column_to_array
+
 
 def clustered_fragments_to_centroid_index(clustered_fragments_df,
                                           centroid_mz_col = "6",
@@ -34,6 +57,9 @@ def clustered_fragments_to_centroid_index(clustered_fragments_df,
     are used as the assignment window. Otherwise, windows are rebuilt as:
         edge = min(std_distance * sigma, ppm_tol / 1e6 * mz)
     and optionally capped by max_abs_tol.
+
+    prior_power is retained only for backwards compatibility with older
+    notebooks. It is not used by the z-score assignment workflow.
     """
 
     centroid_mz = column_to_array(table = clustered_fragments_df,
@@ -99,16 +125,12 @@ def clustered_fragments_to_centroid_index(clustered_fragments_df,
             centroid_edge = np.minimum(centroid_edge,
                                        max_abs_tol)
 
-    centroid_prior = np.power(np.maximum(centroid_count, 1.0),
-                              prior_power)
-
     centroid_order = np.argsort(centroid_mz)
 
     centroid_index = {"centroid_mz": centroid_mz[centroid_order],
                       "centroid_sigma": centroid_sigma[centroid_order],
                       "centroid_edge": centroid_edge[centroid_order],
                       "centroid_count": centroid_count[centroid_order],
-                      "centroid_prior": centroid_prior[centroid_order],
                       "centroid_original_id": centroid_original_id[centroid_order]}
 
     return centroid_index

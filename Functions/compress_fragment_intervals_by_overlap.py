@@ -1,7 +1,32 @@
+# Extracted from notebook: 904937b2-026f-4f59-b3c0-21112b1589f8.ipynb
+# One function per file. Auto-generated from top-level function definitions.
 from __future__ import annotations
+
+from pathlib import Path
+import os
+import re
+import glob
+import sys
 
 import numpy as np
 import pandas as pd
+from scipy.sparse import coo_matrix, csr_matrix
+
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+try:
+    import networkx as nx
+except Exception:
+    nx = None
+
+try:
+    from sklearn.mixture import GaussianMixture
+except Exception:
+    GaussianMixture = None
+
 
 def compress_fragment_intervals_by_overlap(all_fragment_mz_table,
                                            mz_col = 4,
@@ -31,21 +56,28 @@ def compress_fragment_intervals_by_overlap(all_fragment_mz_table,
         compressed_table[:, 6] = segment min mz
         compressed_table[:, 7] = segment max mz
 
+        sorted_fragment_mz_table:
+            the input table after numeric filtering and sorting by interval min.
+            The start/stop indexes in compressed_table refer to this sorted table.
+
+        sorted_fragment_original_row_ids:
+            original row ids corresponding to sorted_fragment_mz_table.
+
         segment_map_df:
             map between original rows and compressed segment ids.
     """
 
     if isinstance(all_fragment_mz_table, pd.DataFrame):
-
         table = all_fragment_mz_table.to_numpy()
 
     else:
-
         table = np.asarray(all_fragment_mz_table)
 
     if len(table) == 0:
         return {"compressed_table": np.zeros((0, 8)),
-                "segment_map_df": pd.DataFrame()}
+                "segment_map_df": pd.DataFrame(),
+                "sorted_fragment_mz_table": np.zeros((0, 0)),
+                "sorted_fragment_original_row_ids": np.array([], dtype = int)}
 
     mz_vec = table[:, mz_col].astype(float)
     interval_left_vec = table[:, min_mz_col].astype(float)
@@ -64,16 +96,20 @@ def compress_fragment_intervals_by_overlap(all_fragment_mz_table,
 
     if np.sum(good_rows) == 0:
         return {"compressed_table": np.zeros((0, 8)),
-                "segment_map_df": pd.DataFrame()}
+                "segment_map_df": pd.DataFrame(),
+                "sorted_fragment_mz_table": np.zeros((0, table.shape[1])),
+                "sorted_fragment_original_row_ids": np.array([], dtype = int)}
 
     original_row_ids = np.where(good_rows)[0]
 
+    filtered_table = table[good_rows, :]
     mz_vec = mz_vec[good_rows]
     interval_min_vec = interval_min_vec[good_rows]
     interval_max_vec = interval_max_vec[good_rows]
 
     interval_order = np.argsort(interval_min_vec)
 
+    sorted_fragment_mz_table = filtered_table[interval_order, :]
     mz_vec = mz_vec[interval_order]
     interval_min_vec = interval_min_vec[interval_order]
     interval_max_vec = interval_max_vec[interval_order]
@@ -163,4 +199,6 @@ def compress_fragment_intervals_by_overlap(all_fragment_mz_table,
         segment_map_df = pd.DataFrame()
 
     return {"compressed_table": compressed_table,
-            "segment_map_df": segment_map_df}
+            "segment_map_df": segment_map_df,
+            "sorted_fragment_mz_table": sorted_fragment_mz_table,
+            "sorted_fragment_original_row_ids": original_row_ids}

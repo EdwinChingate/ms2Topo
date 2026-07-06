@@ -1,8 +1,36 @@
+# Extracted from notebook: 904937b2-026f-4f59-b3c0-21112b1589f8.ipynb
+# One function per file. Auto-generated from top-level function definitions.
 from __future__ import annotations
 
+from pathlib import Path
+import os
+import re
+import glob
+import sys
+
 import numpy as np
-from gmm_variances_1d import *
-from search_neutral_loss_gmm_components import *
+import pandas as pd
+from scipy.sparse import coo_matrix, csr_matrix
+
+try:
+    import matplotlib.pyplot as plt
+except Exception:
+    plt = None
+
+try:
+    import networkx as nx
+except Exception:
+    nx = None
+
+try:
+    from sklearn.mixture import GaussianMixture
+except Exception:
+    GaussianMixture = None
+
+# Local function dependencies extracted from the same notebook.
+from gmm_variances_1d import gmm_variances_1d
+from search_neutral_loss_gmm_components import search_neutral_loss_gmm_components
+
 
 def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                                         mz_windows,
@@ -16,20 +44,34 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                                         max_iter = 1000,
                                         random_state = 7,
                                         std_distance = 3,
-                                        skip_gmm_for_tolerable_iqr = True):
+                                        skip_gmm_for_tolerable_iqr = True,
+                                        assignment_window_padding_da = 0.0,
+                                        assignment_window_padding_ppm = 0.0):
     """
-    Refine mz windows with local GMMs and return an extended mz-object table.
+    Refine m/z windows with local GMMs and return an extended m/z-object table.
 
-    Windows whose IQR is already tolerable are directly collapsed as one
-    component when skip_gmm_for_tolerable_iqr = True.
+    Important:
+        mz_windows[:, 0:2] are start/stop indexes into neutral_losses_array.
+        Therefore neutral_losses_array must be in the same sorted order used
+        to create the compressed windows.
 
-    The tolerable IQR is calculated as:
+        If the windows were created with compress_fragment_intervals_by_overlap,
+        use:
 
-        max(target_component_iqr_da,
-            target_component_iqr_ppm / 1e6 * median_mz)
+            neutral_losses_array = result["sorted_fragment_mz_table"][:, mz_col]
 
-    This treats target_component_iqr_da as the low-mass absolute floor, and
-    target_component_iqr_ppm as the high-mass scaling rule.
+        not the original unsorted all_fragment_mz_table[:, mz_col].
+
+    This function is meant to define an alignment vocabulary, not to filter
+    fragments. For this reason it also reports assignment windows based on the
+    observed component members:
+
+        output[:, 19] = assignment min m/z
+        output[:, 20] = assignment max m/z
+
+    Those columns can be passed to align_consensus_spectra_to_fragment_centroids
+    as centroid_min_mz_col and centroid_max_mz_col to guarantee that training
+    fragments remain inside at least one centroid window.
 
     Output:
         neutral_loss_gmm_peaks[:, 0]  = median mz
@@ -42,8 +84,8 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
         neutral_loss_gmm_peaks[:, 6]  = Gaussian mz, Da
         neutral_loss_gmm_peaks[:, 7]  = Gaussian std, Da
         neutral_loss_gmm_peaks[:, 8]  = Gaussian std, ppm
-        neutral_loss_gmm_peaks[:, 9]  = Gaussian min mz
-        neutral_loss_gmm_peaks[:, 10] = Gaussian max mz
+        neutral_loss_gmm_peaks[:, 9]  = Gaussian min mz, mean - std_distance * std
+        neutral_loss_gmm_peaks[:, 10] = Gaussian max mz, mean + std_distance * std
 
         neutral_loss_gmm_peaks[:, 11] = component weight
         neutral_loss_gmm_peaks[:, 12] = expected count
@@ -54,6 +96,9 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
         neutral_loss_gmm_peaks[:, 16] = local BIC
         neutral_loss_gmm_peaks[:, 17] = local AIC
         neutral_loss_gmm_peaks[:, 18] = delta BIC vs one-component model
+
+        neutral_loss_gmm_peaks[:, 19] = assignment min mz, observed component min - padding
+        neutral_loss_gmm_peaks[:, 20] = assignment max mz, observed component max + padding
     """
 
     if target_component_iqr_da <= 0:
@@ -61,6 +106,12 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
 
     if target_component_iqr_ppm <= 0:
         raise ValueError("target_component_iqr_ppm must be > 0")
+
+    if assignment_window_padding_da < 0:
+        raise ValueError("assignment_window_padding_da must be >= 0")
+
+    if assignment_window_padding_ppm < 0:
+        raise ValueError("assignment_window_padding_ppm must be >= 0")
 
     neutral_losses_array = np.asarray(neutral_losses_array,
                                       dtype = float)
@@ -104,7 +155,12 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                                   75)
 
             component_iqr_mz_da = q3_mz - q1_mz
-            component_iqr_mz_ppm = component_iqr_mz_da / median_mz * 1e6
+
+            if median_mz != 0:
+                component_iqr_mz_ppm = component_iqr_mz_da / median_mz * 1e6
+
+            else:
+                component_iqr_mz_ppm = np.nan
 
             gaussian_mz = np.mean(mz_vec)
 
@@ -122,6 +178,12 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
 
             gaussian_min_mz = gaussian_mz - std_distance * gaussian_std
             gaussian_max_mz = gaussian_mz + std_distance * gaussian_std
+
+            assignment_padding = max(assignment_window_padding_da,
+                                     assignment_window_padding_ppm / 1e6 * gaussian_mz)
+
+            assignment_min_mz = np.min(mz_vec) - assignment_padding
+            assignment_max_mz = np.max(mz_vec) + assignment_padding
 
             rows.append([median_mz,
                          n_points,
@@ -141,7 +203,9 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                          1,
                          np.nan,
                          np.nan,
-                         np.nan])
+                         np.nan,
+                         assignment_min_mz,
+                         assignment_max_mz])
 
             continue
 
@@ -214,7 +278,12 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                                   75)
 
             component_iqr_mz_da = q3_mz - q1_mz
-            component_iqr_mz_ppm = component_iqr_mz_da / median_mz * 1e6
+
+            if median_mz != 0:
+                component_iqr_mz_ppm = component_iqr_mz_da / median_mz * 1e6
+
+            else:
+                component_iqr_mz_ppm = np.nan
 
             gaussian_mz = gaussian_mz_vec[component_id]
             gaussian_std = gaussian_std_vec[component_id]
@@ -222,6 +291,12 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
 
             gaussian_min_mz = gaussian_mz - std_distance * gaussian_std
             gaussian_max_mz = gaussian_mz + std_distance * gaussian_std
+
+            assignment_padding = max(assignment_window_padding_da,
+                                     assignment_window_padding_ppm / 1e6 * gaussian_mz)
+
+            assignment_min_mz = np.min(component_mz_vec) - assignment_padding
+            assignment_max_mz = np.max(component_mz_vec) + assignment_padding
 
             component_responsibility_vec = responsibilities[component_local_ids,
                                                             component_id]
@@ -248,10 +323,12 @@ def gmm_neutral_loss_peaks_from_windows(neutral_losses_array,
                          best_gmm.n_components,
                          local_bic,
                          local_aic,
-                         delta_bic_vs_one])
+                         delta_bic_vs_one,
+                         assignment_min_mz,
+                         assignment_max_mz])
 
     if len(rows) == 0:
-        return np.zeros((0, 19))
+        return np.zeros((0, 21))
 
     neutral_loss_gmm_peaks = np.array(rows,
                                       dtype = float)
