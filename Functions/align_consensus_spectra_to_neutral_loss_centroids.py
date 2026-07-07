@@ -1,36 +1,29 @@
+# Extracted from notebook: 713031fb-407a-42c5-b338-3c1aba9bdf96.ipynb
+# One unique top-level function per file. Auto-generated from top-level function definitions.
 from __future__ import annotations
-
-from pathlib import Path
-import os
-import re
 import numpy as np
-import pandas as pd
-from scipy.sparse import coo_matrix, csr_matrix
-from neutral_loss_assign_mz_vector_to_centroids import *
-from build_centroid_diagnostic_df import *
-from centroid_index_to_dataframe import *
-from neutral_loss_collapse_spectrum_assignments import *
-from get_consensus_spectrum_paths import *
-from neutral_loss_centroids_to_index import *
-from neutral_losses_from_spectrum_arrays import *
-from read_consensus_spectrum_arrays import *
-from sparse_alignment_to_wide_df import *
-from write_sparse_alignment_to_wide_csv import *
+from assign_loaded_consensus_fragments_to_centroids import assign_loaded_consensus_fragments_to_centroids
+from sparse_alignment_to_wide_df import sparse_alignment_to_wide_df
+from write_sparse_alignment_to_wide_csv import write_sparse_alignment_to_wide_csv
+from add_neutral_loss_global_summary_aliases import add_neutral_loss_global_summary_aliases
+from load_consensus_neutral_losses_from_folder import load_consensus_neutral_losses_from_folder
+from rename_neutral_loss_assignment_columns import rename_neutral_loss_assignment_columns
+
 
 def align_consensus_spectra_to_neutral_loss_centroids(consensus_spectra_folder,
-                                                       neutral_loss_gmm_peaks,
+                                                       clustered_neutral_losses_df,
                                                        selected_feat_ids = None,
                                                        file_name_template = "Consensus_ms2-spectra_{feat_id}.csv",
                                                        mz_col = "median_mz(Da)",
                                                        intensity_col = "median_Int",
                                                        mz_std_col = "IQR_mz(Da)",
                                                        mz_iqr_ppm_col = "IQR_mz(ppm)",
-                                                       drop_nonpositive_intensity = True,
-                                                       normalization = "l2",
+                                                       min_mz_col = "min_mz(Da)",
+                                                       max_mz_col = "max_mz(Da)",
+                                                       min_source_fragment_intensity = 0.0,
                                                        min_neutral_loss = 18.0,
                                                        max_neutral_loss = None,
-                                                       min_fragment_intensity = 0,
-                                                       pair_intensity = "min",
+                                                       neutral_loss_iqr_rule = "max_fragment_iqr",
                                                        continue_on_error = True,
                                                        centroid_mz_col = "6",
                                                        centroid_std_col = "7",
@@ -45,297 +38,181 @@ def align_consensus_spectra_to_neutral_loss_centroids(consensus_spectra_folder,
                                                        use_observed_mz_uncertainty = True,
                                                        min_posterior = 0.8,
                                                        min_odds_ratio = 3.0,
+                                                       max_z_score = 3.0,
+                                                       min_z_score_gap = 0.5,
                                                        confident_only = False,
-                                                       aggregation = "max",
                                                        diagnostic_mode = "ambiguous",
+                                                       print_assignment_report = True,
                                                        return_wide_df = False,
-                                                       return_loss_assignment_df = False,
-                                                       output_intensity_path = None,
+                                                       return_loaded_neutral_losses_df = False,
+                                                       output_presence_path = None,
                                                        output_mz_path = None):
     """
-    Align within-spectrum neutral losses to an already learned GMM neutral-loss
+    Align generated neutral losses from consensus MS2 spectra to a neutral-loss
     centroid vocabulary.
 
-    This function is the neutral-loss analogue of fragment centroid assignment:
-        consensus spectra -> fragment differences -> GMM centroid assignment ->
-        aligned neutral-loss intensity/mz matrices.
+    This function is intentionally separate from
+    align_consensus_spectra_to_fragment_centroids. Fragments are directly read
+    from consensus spectra and yield an intensity matrix. Neutral losses are
+    generated from fragment pairs and yield a presence/absence matrix.
 
-    Key outputs:
-        aligned_loss_intensity_sparse_mat
-        aligned_loss_mz_sparse_mat
-        loss_assignment_df                 optional, potentially large
-        candidate_diagnostic_df            ambiguous/all GMM decisions
-        centroid_diagnostic_df             centroid-level behavior
-        assignment_summary_df              spectrum-level coverage
+    Output matrix semantics:
+        rows    = aligned neutral-loss centroids
+        columns = consensus spectra / feat_id
+        values  = 1 if one or more fragment pairs in the consensus spectrum
+                  were assigned to the neutral-loss centroid, else 0
     """
 
-    spectrum_rows = get_consensus_spectrum_paths(consensus_spectra_folder = consensus_spectra_folder,
-                                                 selected_feat_ids = selected_feat_ids,
-                                                 file_name_template = file_name_template)
+    loaded_result = load_consensus_neutral_losses_from_folder(consensus_spectra_folder = consensus_spectra_folder,
+                                                              selected_feat_ids = selected_feat_ids,
+                                                              file_name_template = file_name_template,
+                                                              mz_col = mz_col,
+                                                              intensity_col = intensity_col,
+                                                              mz_std_col = mz_std_col,
+                                                              mz_iqr_ppm_col = mz_iqr_ppm_col,
+                                                              min_mz_col = min_mz_col,
+                                                              max_mz_col = max_mz_col,
+                                                              min_source_fragment_intensity = min_source_fragment_intensity,
+                                                              min_neutral_loss = min_neutral_loss,
+                                                              max_neutral_loss = max_neutral_loss,
+                                                              neutral_loss_iqr_rule = neutral_loss_iqr_rule,
+                                                              continue_on_error = continue_on_error)
 
-    if len(spectrum_rows) == 0:
-        raise ValueError("No consensus spectra were found.")
+    loaded_neutral_losses_df = loaded_result["loaded_consensus_fragments_df"]
+    feature_id_map_df = loaded_result["feature_id_map_df"]
+    summary_df = loaded_result["summary_df"]
 
-    centroid_index = neutral_loss_centroids_to_index(neutral_loss_gmm_peaks = neutral_loss_gmm_peaks,
-                                                     centroid_mz_col = centroid_mz_col,
-                                                     centroid_std_col = centroid_std_col,
-                                                     centroid_count_col = centroid_count_col,
-                                                     centroid_min_mz_col = centroid_min_mz_col,
-                                                     centroid_max_mz_col = centroid_max_mz_col,
-                                                     std_distance = std_distance,
-                                                     ppm_tol = ppm_tol,
-                                                     max_abs_tol = max_abs_tol,
-                                                     sigma_floor = sigma_floor,
-                                                     prior_power = prior_power)
+    if len(loaded_neutral_losses_df) == 0:
+        raise ValueError("No neutral-loss observations were generated. Check summary_df for failed or empty spectra.")
 
-    centroid_df = centroid_index_to_dataframe(centroid_index = centroid_index,
-                                                  id_col = "aligned_loss_id",
-                                                  mz_col = "aligned_loss_mz")
+    assignment_result = assign_loaded_consensus_fragments_to_centroids(
+        loaded_consensus_fragments_df = loaded_neutral_losses_df,
+        feature_id_map_df = feature_id_map_df,
+        clustered_fragments_df = clustered_neutral_losses_df,
+        mz_col = "neutral_loss_mz",
+        intensity_col = "neutral_loss_presence",
+        mz_std_col = "neutral_loss_iqr_da",
+        spectrum_id_col = "spectrum_id",
+        centroid_mz_col = centroid_mz_col,
+        centroid_std_col = centroid_std_col,
+        centroid_count_col = centroid_count_col,
+        centroid_min_mz_col = centroid_min_mz_col,
+        centroid_max_mz_col = centroid_max_mz_col,
+        std_distance = std_distance,
+        ppm_tol = ppm_tol,
+        max_abs_tol = max_abs_tol,
+        sigma_floor = sigma_floor,
+        prior_power = prior_power,
+        use_observed_mz_uncertainty = use_observed_mz_uncertainty,
+        min_posterior = min_posterior,
+        min_odds_ratio = min_odds_ratio,
+        max_z_score = max_z_score,
+        min_z_score_gap = min_z_score_gap,
+        confident_only = confident_only,
+        aggregation = "max",
+        diagnostic_mode = diagnostic_mode)
 
-    n_centroids = len(centroid_index["centroid_mz"])
+    aligned_presence_sparse_mat = assignment_result["aligned_intensity_sparse_mat"].copy()
 
-    row_chunks = []
-    col_chunks = []
-    intensity_chunks = []
-    mz_chunks = []
-    assignment_rows = []
-    diagnostic_rows = []
-    summary_rows = []
-    feature_id_map_rows = []
+    if aligned_presence_sparse_mat.nnz > 0:
+        aligned_presence_sparse_mat.data[:] = 1.0
 
-    spectrum_id = 0
+    aligned_neutral_loss_mz_sparse_mat = assignment_result["aligned_mz_sparse_mat"]
+    aligned_neutral_loss_mz_vec = assignment_result["aligned_fragment_mz_vec"]
 
-    for spectrum_row in spectrum_rows:
+    neutral_loss_assignment_df = rename_neutral_loss_assignment_columns(assignment_result["fragment_assignment_df"])
+    unassigned_neutral_loss_df = rename_neutral_loss_assignment_columns(assignment_result["unassigned_fragment_df"])
+    candidate_diagnostic_df = assignment_result["candidate_diagnostic_df"].copy()
+    collapsed_presence_df = assignment_result["collapsed_assignment_df"].copy()
 
-        feat_id = spectrum_row["feat_id"]
-        consensus_spectrum_path = spectrum_row["consensus_spectrum_path"]
+    if len(collapsed_presence_df) > 0:
+        collapsed_presence_df = collapsed_presence_df.rename(columns = {"aligned_fragment_id": "aligned_neutral_loss_id",
+                                                                        "aligned_fragment_mz": "aligned_neutral_loss_mz",
+                                                                        "aligned_intensity": "aligned_presence"})
+        collapsed_presence_df["aligned_presence"] = 1.0
 
-        try:
-            spectrum_arrays = read_consensus_spectrum_arrays(consensus_spectrum_path = consensus_spectrum_path,
-                                                             mz_col = mz_col,
-                                                             intensity_col = intensity_col,
-                                                             mz_std_col = mz_std_col,
-                                                             mz_iqr_ppm_col = mz_iqr_ppm_col,
-                                                             drop_nonpositive_intensity = drop_nonpositive_intensity,
-                                                             normalization = normalization)
+    neutral_loss_summary_df = assignment_result["assignment_summary_df"].copy()
+    neutral_loss_global_summary_df = add_neutral_loss_global_summary_aliases(assignment_result["assignment_global_summary_df"])
 
-            fragment_mz = spectrum_arrays["fragment_mz"]
-            fragment_intensity = spectrum_arrays["fragment_intensity"]
-            fragment_mz_std = spectrum_arrays["fragment_mz_std"]
-            fragment_id = spectrum_arrays["fragment_id"]
+    if print_assignment_report:
+        report_row = neutral_loss_global_summary_df.iloc[0]
 
-            if len(fragment_mz) > 0 and min_fragment_intensity > 0:
-                keep_fragment = fragment_intensity > min_fragment_intensity
-                fragment_mz = fragment_mz[keep_fragment]
-                fragment_intensity = fragment_intensity[keep_fragment]
-                fragment_mz_std = fragment_mz_std[keep_fragment]
-                fragment_id = fragment_id[keep_fragment]
+        raw_total = int(summary_df["n_raw_fragment_rows"].sum()) if "n_raw_fragment_rows" in summary_df.columns else np.nan
+        source_total = int(summary_df["n_source_fragments_for_neutral_losses"].sum()) if "n_source_fragments_for_neutral_losses" in summary_df.columns else np.nan
+        generated_total = int(summary_df["n_generated_neutral_losses"].sum()) if "n_generated_neutral_losses" in summary_df.columns else np.nan
+        assigned_total = int(report_row["n_assigned_neutral_losses"])
+        unassigned_total = int(report_row["n_unassigned_neutral_losses"])
+        no_candidate_total = int(report_row["n_neutral_losses_with_no_candidate_centroid"])
 
-            losses = neutral_losses_from_spectrum_arrays(fragment_mz = fragment_mz,
-                                                         fragment_intensity = fragment_intensity,
-                                                         fragment_mz_std = fragment_mz_std,
-                                                         fragment_id = fragment_id,
-                                                         min_neutral_loss = min_neutral_loss,
-                                                         max_neutral_loss = max_neutral_loss,
-                                                         pair_intensity = pair_intensity)
+        print("Consensus MS2 neutral-loss assignment report")
+        print(f"  Raw fragment rows read: {raw_total}")
+        print(f"  Source fragments used for neutral-loss generation: {source_total}")
+        print(f"  Neutral-loss observations generated: {generated_total}")
+        print(f"  Neutral-loss observations tested against centroids: {int(report_row['n_generated_neutral_losses_tested'])}")
+        print(f"  Assigned neutral-loss observations: {assigned_total}")
+        print(f"  Unassigned neutral-loss observations: {unassigned_total}")
+        print(f"  Neutral losses with no candidate centroid in the m/z window: {no_candidate_total}")
+        print(f"  Assigned fraction by neutral-loss count: {report_row['assigned_fraction_fragments']:.6f}")
+        print("  Aligned value type: presence_absence")
 
-            neutral_loss_mz = losses["neutral_loss_mz"]
-            neutral_loss_intensity = losses["neutral_loss_intensity"]
-            neutral_loss_mz_std = losses["neutral_loss_mz_std"]
+        if bool(report_row["all_neutral_losses_assigned"]):
+            print("  OK: all generated neutral-loss observations were assigned to a centroid.")
 
-            if use_observed_mz_uncertainty:
-                sigma_obs_vec = neutral_loss_mz_std
+        else:
+            print("  WARNING: some generated neutral-loss observations did not match any centroid.")
+            print("  Inspect result['unassigned_neutral_loss_df'] for the unmatched neutral losses.")
 
-            else:
-                sigma_obs_vec = None
-
-            assigned_rows, posterior_vec, n_candidates_vec, status_vec, residual_vec, z_vec, current_diagnostic_rows = neutral_loss_assign_mz_vector_to_centroids(
-                mz_vec = neutral_loss_mz,
-                centroid_index = centroid_index,
-                sigma_obs_vec = sigma_obs_vec,
-                min_posterior = min_posterior,
-                min_odds_ratio = min_odds_ratio,
-                diagnostic_mode = diagnostic_mode)
-
-            centroid_rows, collapsed_intensity, collapsed_mz = neutral_loss_collapse_spectrum_assignments(
-                assigned_centroid_row = assigned_rows,
-                observed_mz_vec = neutral_loss_mz,
-                intensity_vec = neutral_loss_intensity,
-                status_vec = status_vec,
-                confident_only = confident_only,
-                aggregation = aggregation)
-
-            if len(centroid_rows) > 0:
-                row_chunks.append(centroid_rows)
-                col_chunks.append(np.full(len(centroid_rows),
-                                          spectrum_id,
-                                          dtype = np.int64))
-                intensity_chunks.append(collapsed_intensity)
-                mz_chunks.append(collapsed_mz)
-
-            for diagnostic_row in current_diagnostic_rows:
-                value_id = diagnostic_row.pop("value_id")
-                diagnostic_row["spectrum_id"] = int(spectrum_id)
-                diagnostic_row["feat_id"] = feat_id
-                diagnostic_row["neutral_loss_pair_id"] = int(value_id)
-                diagnostic_rows.append(diagnostic_row)
-
-            if return_loss_assignment_df:
-                assignment_df = pd.DataFrame({"spectrum_id": int(spectrum_id),
-                                              "feat_id": feat_id,
-                                              "neutral_loss_pair_id": np.arange(len(neutral_loss_mz), dtype = int),
-                                              "neutral_loss_mz": neutral_loss_mz,
-                                              "neutral_loss_intensity": neutral_loss_intensity,
-                                              "neutral_loss_mz_std": neutral_loss_mz_std,
-                                              "fragment_low_id": losses["fragment_low_id"],
-                                              "fragment_high_id": losses["fragment_high_id"],
-                                              "fragment_low_mz": losses["fragment_low_mz"],
-                                              "fragment_high_mz": losses["fragment_high_mz"],
-                                              "fragment_low_intensity": losses["fragment_low_intensity"],
-                                              "fragment_high_intensity": losses["fragment_high_intensity"],
-                                              "assigned_loss_id": assigned_rows,
-                                              "assigned_loss_mz": np.where(assigned_rows >= 0,
-                                                                           centroid_index["centroid_mz"][np.maximum(assigned_rows, 0)],
-                                                                           np.nan),
-                                              "assignment_posterior": posterior_vec,
-                                              "n_candidate_losses": n_candidates_vec,
-                                              "assignment_status": status_vec,
-                                              "mz_residual": residual_vec,
-                                              "z_score": z_vec})
-
-                assignment_rows.append(assignment_df)
-
-            total_loss_intensity = float(np.sum(neutral_loss_intensity[np.isfinite(neutral_loss_intensity)]))
-
-            assigned_filter = assigned_rows >= 0
-
-            if confident_only:
-                assigned_filter = assigned_filter & (status_vec == 2)
-
-            assigned_loss_intensity = float(np.sum(neutral_loss_intensity[assigned_filter])) if len(neutral_loss_intensity) > 0 else 0.0
-
-            if total_loss_intensity > 0:
-                assigned_fraction_int = assigned_loss_intensity / total_loss_intensity
-
-            else:
-                assigned_fraction_int = np.nan
-
-            summary_rows.append({"spectrum_id": int(spectrum_id),
-                                 "feat_id": feat_id,
-                                 "status": "ok",
-                                 "n_fragments": int(len(fragment_mz)),
-                                 "n_neutral_losses": int(len(neutral_loss_mz)),
-                                 "n_assigned_losses": int(np.sum(assigned_rows >= 0)),
-                                 "n_confident_losses": int(np.sum(status_vec == 2)),
-                                 "n_ambiguous_losses": int(np.sum(status_vec == 1)),
-                                 "total_loss_intensity": total_loss_intensity,
-                                 "assigned_loss_intensity": assigned_loss_intensity,
-                                 "assigned_fraction_int": assigned_fraction_int,
-                                 "source_file": consensus_spectrum_path.name,
-                                 "error_message": ""})
-
-            feature_id_map_rows.append({"spectrum_id": int(spectrum_id),
-                                        "feat_id": feat_id,
-                                        "consensus_spectrum_file": str(consensus_spectrum_path)})
-
-            spectrum_id += 1
-
-        except Exception as error:
-            summary_rows.append({"spectrum_id": np.nan,
-                                 "feat_id": feat_id,
-                                 "status": "failed",
-                                 "n_fragments": 0,
-                                 "n_neutral_losses": 0,
-                                 "n_assigned_losses": 0,
-                                 "n_confident_losses": 0,
-                                 "n_ambiguous_losses": 0,
-                                 "total_loss_intensity": 0.0,
-                                 "assigned_loss_intensity": 0.0,
-                                 "assigned_fraction_int": np.nan,
-                                 "source_file": Path(consensus_spectrum_path).name,
-                                 "error_message": str(error)})
-
-            if not continue_on_error:
-                raise
-
-    n_spectra = spectrum_id
-
-    if len(intensity_chunks) == 0:
-        aligned_loss_intensity_sparse_mat = csr_matrix((n_centroids, n_spectra), dtype = float)
-        aligned_loss_mz_sparse_mat = csr_matrix((n_centroids, n_spectra), dtype = float)
-
-    else:
-        rows = np.concatenate(row_chunks)
-        cols = np.concatenate(col_chunks)
-
-        aligned_loss_intensity_sparse_mat = coo_matrix((np.concatenate(intensity_chunks),
-                                                        (rows, cols)),
-                                                       shape = (n_centroids, n_spectra)).tocsr()
-
-        aligned_loss_mz_sparse_mat = coo_matrix((np.concatenate(mz_chunks),
-                                                 (rows, cols)),
-                                                shape = (n_centroids, n_spectra)).tocsr()
-
-    feature_id_map_df = pd.DataFrame(feature_id_map_rows)
-    assignment_summary_df = pd.DataFrame(summary_rows)
-    candidate_diagnostic_df = pd.DataFrame(diagnostic_rows)
-
-    if len(assignment_rows) > 0:
-        loss_assignment_df = pd.concat(assignment_rows,
-                                       axis = 0,
-                                       ignore_index = True)
-
-    else:
-        loss_assignment_df = pd.DataFrame()
-
-    centroid_diagnostic_df = build_centroid_diagnostic_df(loss_assignment_df = loss_assignment_df,
-                                                          centroid_df = centroid_df)
-
-    aligned_loss_mz_vec = centroid_index["centroid_mz"]
-
-    if output_intensity_path is not None:
-        write_sparse_alignment_to_wide_csv(aligned_sparse_mat = aligned_loss_intensity_sparse_mat,
-                                           aligned_mz_vec = aligned_loss_mz_vec,
+    if output_presence_path is not None:
+        write_sparse_alignment_to_wide_csv(aligned_sparse_mat = aligned_presence_sparse_mat,
+                                           aligned_mz_vec = aligned_neutral_loss_mz_vec,
                                            feature_id_map_df = feature_id_map_df,
-                                           output_path = output_intensity_path,
-                                           id_col = "aligned_loss_id",
-                                           mz_col = "aligned_loss_mz")
+                                           output_path = output_presence_path,
+                                           id_col = "aligned_neutral_loss_id",
+                                           mz_col = "aligned_neutral_loss_mz")
 
     if output_mz_path is not None:
-        write_sparse_alignment_to_wide_csv(aligned_sparse_mat = aligned_loss_mz_sparse_mat,
-                                           aligned_mz_vec = aligned_loss_mz_vec,
+        write_sparse_alignment_to_wide_csv(aligned_sparse_mat = aligned_neutral_loss_mz_sparse_mat,
+                                           aligned_mz_vec = aligned_neutral_loss_mz_vec,
                                            feature_id_map_df = feature_id_map_df,
                                            output_path = output_mz_path,
-                                           id_col = "aligned_loss_id",
-                                           mz_col = "aligned_loss_mz")
+                                           id_col = "aligned_neutral_loss_id",
+                                           mz_col = "aligned_neutral_loss_mz")
 
     if return_wide_df:
-        aligned_loss_intensity_df = sparse_alignment_to_wide_df(aligned_sparse_mat = aligned_loss_intensity_sparse_mat,
-                                                                aligned_mz_vec = aligned_loss_mz_vec,
-                                                                feature_id_map_df = feature_id_map_df,
-                                                                id_col = "aligned_loss_id",
-                                                                mz_col = "aligned_loss_mz")
+        aligned_presence_df = sparse_alignment_to_wide_df(aligned_sparse_mat = aligned_presence_sparse_mat,
+                                                          aligned_mz_vec = aligned_neutral_loss_mz_vec,
+                                                          feature_id_map_df = feature_id_map_df,
+                                                          id_col = "aligned_neutral_loss_id",
+                                                          mz_col = "aligned_neutral_loss_mz")
 
-        aligned_loss_observed_mz_df = sparse_alignment_to_wide_df(aligned_sparse_mat = aligned_loss_mz_sparse_mat,
-                                                                  aligned_mz_vec = aligned_loss_mz_vec,
-                                                                  feature_id_map_df = feature_id_map_df,
-                                                                  id_col = "aligned_loss_id",
-                                                                  mz_col = "aligned_loss_mz")
+        aligned_neutral_loss_mz_df = sparse_alignment_to_wide_df(aligned_sparse_mat = aligned_neutral_loss_mz_sparse_mat,
+                                                                 aligned_mz_vec = aligned_neutral_loss_mz_vec,
+                                                                 feature_id_map_df = feature_id_map_df,
+                                                                 id_col = "aligned_neutral_loss_id",
+                                                                 mz_col = "aligned_neutral_loss_mz")
 
     else:
-        aligned_loss_intensity_df = None
-        aligned_loss_observed_mz_df = None
+        aligned_presence_df = None
+        aligned_neutral_loss_mz_df = None
 
-    return {"aligned_loss_intensity_sparse_mat": aligned_loss_intensity_sparse_mat,
-            "aligned_loss_mz_sparse_mat": aligned_loss_mz_sparse_mat,
-            "aligned_loss_mz_vec": aligned_loss_mz_vec,
-            "aligned_loss_intensity_df": aligned_loss_intensity_df,
-            "aligned_loss_observed_mz_df": aligned_loss_observed_mz_df,
-            "loss_assignment_df": loss_assignment_df,
-            "candidate_diagnostic_df": candidate_diagnostic_df,
-            "centroid_diagnostic_df": centroid_diagnostic_df,
-            "assignment_summary_df": assignment_summary_df,
-            "centroid_df": centroid_df,
-            "centroid_index": centroid_index,
-            "feature_id_map_df": feature_id_map_df,
-            "summary_df": assignment_summary_df}
+    result = {"aligned_presence_sparse_mat": aligned_presence_sparse_mat,
+              "aligned_neutral_loss_mz_sparse_mat": aligned_neutral_loss_mz_sparse_mat,
+              "aligned_neutral_loss_mz_vec": aligned_neutral_loss_mz_vec,
+              "aligned_presence_df": aligned_presence_df,
+              "aligned_neutral_loss_mz_df": aligned_neutral_loss_mz_df,
+              "neutral_loss_assignment_df": neutral_loss_assignment_df,
+              "unassigned_neutral_loss_df": unassigned_neutral_loss_df,
+              "candidate_diagnostic_df": candidate_diagnostic_df,
+              "collapsed_presence_df": collapsed_presence_df,
+              "neutral_loss_summary_df": neutral_loss_summary_df,
+              "neutral_loss_global_summary_df": neutral_loss_global_summary_df,
+              "centroid_diagnostic_df": assignment_result["centroid_diagnostic_df"],
+              "centroid_df": assignment_result["centroid_df"],
+              "centroid_index": assignment_result["centroid_index"],
+              "feature_id_map_df": feature_id_map_df,
+              "summary_df": summary_df}
+
+    if return_loaded_neutral_losses_df:
+        result["loaded_neutral_losses_df"] = loaded_neutral_losses_df
+
+    return result
